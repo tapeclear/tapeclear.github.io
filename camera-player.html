@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>相机播放器 · VEROX-7</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0e0f12;background-image:radial-gradient(1000px 620px at 50% -10%,#1a1c22,transparent);color:#e8e6e0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 16px 56px}
+header{text-align:center;margin-bottom:24px}
+header h1{font-size:19px;font-weight:700;letter-spacing:1px;color:#f2efe8}
+header .sub{margin-top:7px;font-size:13px;color:#8d8b85}
+.cam{width:430px;max-width:100%;background:#151515;border:1px solid #000;border-radius:10px;box-shadow:0 30px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);position:relative;padding-bottom:6px}
+.cam-top{display:flex;align-items:center;gap:13px;padding:16px 16px 12px;background:linear-gradient(180deg,#242424,#171717);border-radius:10px 10px 0 0;border-bottom:1px solid #000}
+.cam-pwr{width:26px;height:34px;border-radius:4px;background:linear-gradient(180deg,#3a3a3a,#1c1c1c);border:1px solid #000;cursor:pointer;font-size:8px;color:#999;font-family:ui-monospace,monospace;letter-spacing:1px;flex:none;padding:0}
+.cam-pwr:active{background:#111}
+.cam-shutter{width:50px;height:50px;border-radius:50%;flex:none;cursor:pointer;border:1px solid #000;position:relative;padding:0;background:radial-gradient(circle at 36% 30%,#5c5c5c,#232323 65%,#101010);box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 2px 3px rgba(255,255,255,.25),inset 0 -3px 6px #000}
+.cam-shutter::after{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#7b7b7b,#2e2e2e);box-shadow:inset 0 1px 2px rgba(255,255,255,.3),inset 0 -2px 4px #000}
+.cam-shutter:active{transform:translateY(1px)}
+.cam-red{width:11px;height:11px;border-radius:50%;background:#d0342c;box-shadow:0 0 9px rgba(208,52,44,.55);flex:none}
+.shoulder{flex:1;min-width:0;position:relative;background:#0b0b0b;border:1px solid #000;border-radius:5px;padding:9px 12px;font-family:ui-monospace,"Courier New",monospace;font-size:11px;letter-spacing:1px;color:#ffb14d;text-shadow:0 0 7px rgba(255,177,77,.5);display:flex;justify-content:space-between;gap:8px;box-shadow:inset 0 0 16px rgba(0,0,0,.9),inset 0 0 0 1px rgba(255,177,77,.08);white-space:nowrap;overflow:hidden}
+.shoulder span{overflow:hidden;text-overflow:ellipsis}
+.sh-boot{position:absolute;inset:0;background:#0b0b0b;display:flex;align-items:center;justify-content:center;letter-spacing:4px;opacity:0;transition:opacity .3s;pointer-events:none}
+.sh-boot.on{opacity:1}
+.cam-main{display:flex;gap:13px;padding:14px 16px 12px}
+.cam-screen{flex:1;min-width:0;aspect-ratio:4/3;background:#000;border:2px solid #000;border-radius:5px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px #262626,inset 0 0 34px rgba(0,0,0,.9);color:#e6e6e6;font-family:ui-monospace,"Courier New",monospace;display:flex;flex-direction:column}
+.cs-top{display:flex;align-items:center;gap:8px;padding:6px 9px;font-size:9px;letter-spacing:.5px;color:#c9c9c9;border-bottom:1px solid rgba(255,255,255,.08)}
+.cs-state{display:flex;align-items:center;gap:5px;flex:none;color:#fff;font-weight:700}
+.cs-icon{flex:none}
+.cs-icon.play{border-left:7px solid #fff;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;width:0;height:0}
+.cs-icon.pause{width:7px;height:9px;background:linear-gradient(90deg,#fff 0 2.5px,transparent 2.5px 4.5px,#fff 4.5px 7px)}
+.cs-file{margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-photo{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:6px 12px;min-height:0}
+.cs-art{flex:none;display:flex;align-items:center;justify-content:center;height:100%;max-width:100%;aspect-ratio:1}
+.cs-art img,.cs-art svg{width:100%;height:100%;object-fit:cover;display:block;box-shadow:0 6px 18px rgba(0,0,0,.8)}
+/* 照片双指缩放 */
+.cs-photo{touch-action:none}
+.cs-photo img,.cs-photo svg{will-change:transform}
+.cam-screen.disp-none .cs-photo{padding:0 8px}
+.af{position:absolute;inset:12px;pointer-events:none}
+.af i{position:absolute;width:13px;height:13px;border:2px solid rgba(255,255,255,.75)}
+.af i.tl{top:0;left:0;border-right:none;border-bottom:none}
+.af i.tr{top:0;right:0;border-left:none;border-bottom:none}
+.af i.bl{bottom:0;left:0;border-right:none;border-top:none}
+.af i.br{bottom:0;right:0;border-left:none;border-top:none}
+.cs-param{position:absolute;top:10px;right:14px;text-align:right;font-size:9px;line-height:1.7;color:#f2f2f2;text-shadow:0 1px 3px #000,0 0 2px #000}
+.cs-param .hl{color:#ffd257}
+.cs-spec{position:absolute;top:10px;left:14px;width:52px;height:32px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.25)}
+.cam-screen.disp-min .cs-spec,.cam-screen.disp-min .af{display:none}
+.cam-screen.disp-none .cs-spec,.cam-screen.disp-none .af,.cam-screen.disp-none .cs-param{display:none}
+.cs-bottom{padding:7px 9px 9px;border-top:1px solid rgba(255,255,255,.08)}
+.cs-track{height:3px;background:rgba(255,255,255,.18);border-radius:2px;position:relative}
+.cs-fill{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:2px;width:0%}
+.cs-knob{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 6px rgba(255,255,255,.7);left:0%}
+.cs-time{display:flex;justify-content:space-between;font-size:9px;color:#a8a8a8;margin-top:6px;letter-spacing:.5px}
+.cam-keys{display:flex;flex-direction:column;gap:9px;justify-content:center;flex:none;padding-right:4px}
+.cam-key{width:54px;height:29px;border-radius:15px;background:linear-gradient(180deg,#2e2e2e,#1a1a1a);border:1px solid #000;color:#c2c2c2;font-family:ui-monospace,monospace;font-size:9px;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.14);padding:0}
+.cam-key:active{transform:translateY(1px);background:#121212}
+.cam-foot{display:flex;align-items:center;gap:10px;padding:2px 18px 10px}
+.cam-logo{font-family:Georgia,serif;font-weight:700;font-size:16px;letter-spacing:2px;color:#ececec}
+.cam-logo sup{font-size:9px;color:#9c9c9c}
+.cam-foot .rd{width:12px;height:12px;border-radius:50%;background:#d0342c;box-shadow:0 0 8px rgba(208,52,44,.5)}
+.cam-foot .tag{margin-left:auto;font-size:9px;color:#7c7c7c;letter-spacing:1.5px;font-family:ui-monospace,monospace}
+.boot{position:absolute;inset:0;background:#000;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;transition:opacity .45s}
+.boot.off{opacity:0;pointer-events:none}
+.boot .word{font-family:Georgia,serif;font-size:24px;font-weight:700;color:#f2f2f2;letter-spacing:.5em;transition:letter-spacing 1s ease,opacity .8s;opacity:0;padding-left:.5em}
+.boot.on .word{letter-spacing:.18em;opacity:1;padding-left:.18em}
+.boot .dot{width:14px;height:14px;border-radius:50%;background:#d0342c;box-shadow:0 0 14px rgba(208,52,44,.8);opacity:0;transition:opacity .6s .35s}
+.boot.on .dot{opacity:1}
+.boot .s{font-size:9px;color:#8a8a8a;letter-spacing:3px;opacity:0;transition:opacity .6s .6s}
+.boot.on .s{opacity:1}
+.grip{position:absolute;right:0;top:76px;bottom:36px;width:10px;border-radius:0 6px 6px 0;background:repeating-linear-gradient(115deg,#262626 0 3px,#151515 3px 6px);border:1px solid #000;border-right:none}
+.hint{margin-top:20px;font-size:12px;color:#8d8b85;max-width:460px;text-align:center;line-height:1.9}
+.hint b{color:#c9c6be}
+/* ===== 手机窄屏自适应（桌面样式完全不变） ===== */
+@media (max-width:480px){
+body{padding:20px 8px 44px}
+header h1{font-size:16px}
+header .sub{font-size:11px}
+.cam{width:100%}
+.cam-top{padding:12px 10px 10px;gap:8px}
+.cam-pwr{width:22px;height:30px;font-size:7px}
+.cam-shutter{width:44px;height:44px}
+.cam-shutter::after{inset:11px}
+.cam-red{width:9px;height:9px}
+.shoulder{font-size:9px;padding:8px 9px;gap:6px;letter-spacing:0}
+.sh-boot{letter-spacing:2px;font-size:10px}
+.cam-main{padding:10px 10px 12px;gap:8px}
+.cam-keys{gap:7px;padding-right:4px}
+.cam-key{width:46px;height:26px;font-size:8px}
+.cs-top{font-size:8px;padding:5px 7px;gap:6px}
+.cs-photo{padding:6px 8px}
+.cs-param{font-size:8px;right:10px;top:8px}
+.cs-spec{width:44px;height:26px;top:8px;left:10px}
+.cs-bottom{padding:6px 7px 8px}
+.cs-time{font-size:8px}
+.cam-foot{padding:2px 12px 8px;gap:8px}
+.cam-logo{font-size:14px}
+.cam-foot .tag{font-size:7px;letter-spacing:1px}
+.grip{top:60px;bottom:26px;width:8px}
+.boot .word{font-size:19px}
+.hint{font-size:11px}
+}
+</style>
+</head>
+<body>
+<script src="https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js"></script>
+<script>
+/* ══════════════════════════════════════════════════
+   ★ 歌曲配置区 ★
+   歌曲和封面放在本网页同一个文件夹的 music / covers 里
+   ══════════════════════════════════════════════════ */
+/* 歌单统一从 https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js 读取（和随身听共用一份） */
+const SONGS = (window.PLAYLIST || []).map(function(s){
+  return {
+    title: s.title,
+    artist: s.artist || '',
+    src: s.file,
+    cover: s.cover || ''
+  };
+});
+</script>
+<header>
+  <h1>相机播放器 · VEROX-7</h1>
+  <p class="sub">肩屏 + 背屏回放 UI · 快门键 = 播放 / 暂停 · 长按 LOOP 键切换声道宽度</p>
+</header>
+<div class="cam">
+  <div class="cam-top">
+    <button class="cam-pwr" id="camPwr" title="电源 / 重播开机动画">PWR</button>
+    <div class="shoulder">
+      <span id="csTrackNo">TRK 01/35</span>
+      <span id="camMode">A</span>
+      <span id="shState">PAUSE</span>
+      <span id="shRem">REM --:--</span>
+      <span class="sh-boot" id="shBoot">VEROX-7</span>
+    </div>
+    <button class="cam-shutter" id="shutter" title="快门 = 播放 / 暂停" aria-label="快门"></button>
+    <span class="cam-red"></span>
+  </div>
+  <div class="cam-main">
+    <div class="cam-screen" id="camScreen">
+      <div class="boot" id="camBoot">
+        <span class="dot"></span>
+        <span class="word">VEROX</span>
+        <span class="s">BACKSTAGE SERIES · STARTING</span>
+      </div>
+      <div class="cs-top">
+        <span class="cs-state"><span class="cs-icon pause" id="csIcon"></span><span id="csStateTxt">PAUSE</span></span>
+        <span class="cs-file" id="csFile">--</span>
+      </div>
+      <div class="cs-photo">
+        <div class="cs-art" id="csArt"></div>
+        <div class="af"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+        <div class="cs-param">f/2.8 · 1/250<br>ISO 400 · EV ±0<br><span class="hl" id="csBpm">LOOP-A</span></div>
+        <canvas class="cs-spec" id="csSpec"></canvas>
+      </div>
+      <div class="cs-bottom">
+        <div class="cs-track"><div class="cs-fill" id="csFill"></div><div class="cs-knob" id="csKnob"></div></div>
+        <div class="cs-time"><span id="csCur">00:00</span><span id="csRem2">REM --:--</span></div>
+      </div>
+    </div>
+    <div class="cam-keys">
+      <button class="cam-key" id="csDisp">DISP</button>
+      <button class="cam-key" id="csPrev">PREV</button>
+      <button class="cam-key" id="csNext">NEXT</button>
+      <button class="cam-key" id="csMode" title="点按 = 循环模式 · 长按 = 声道宽度">LOOP</button>
+    </div>
+  </div>
+  <div class="cam-foot">
+    <span class="cam-logo">VEROX<sup>-7</sup></span>
+    <span class="rd"></span>
+    <span class="tag">Z-LENS 28/2 ASPH · MADE IN WEB</span>
+  </div>
+  <div class="grip"></div>
+</div>
+<p class="hint"><b>操作</b>：快门 = 播放 / 暂停；PREV / NEXT = 切歌；DISP = 切信息显示；LOOP = 点按切循环模式、<b>长按一秒切声道宽度（NORMAL → WIDE → SUPER）</b>。手机上机身会自动撑满屏宽。</p>
+<script>
+/* ================== 工具 ================== */
+const $ = id => document.getElementById(id);
+const audio = new Audio();
+audio.preload = "metadata";
+let idx = 0, mode = 0, disp = 0, raf = null, actx = null, analyser = null, fdata = null;
+const MODES = [["LOOP-A","A"],["LOOP-1","1"],["RND","RND"]];
+const specC = $("csSpec"), sg = specC.getContext("2d");
+/* ---------- 占位封面（未填 cover 时显示歌名） ---------- */
+const PH = [["#2e6e4e","#e9e4d5"],["#4a2a6a","#f2e8ff"],["#e07840","#f6ead8"],["#101828","#9fd8ff"],["#8a3a3a","#f6dede"],["#3a5a8a","#dce8f6"]];
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function phSVG(i){
+  const s = SONGS[i], c = PH[i % PH.length];
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="'+c[0]+'"/><circle cx="50" cy="42" r="16" fill="none" stroke="'+c[1]+'" stroke-width="3" opacity=".9"/><circle cx="50" cy="42" r="7" fill="'+c[1]+'" opacity=".9"/><text x="50" y="82" text-anchor="middle" font-size="8" fill="'+c[1]+'" font-family="sans-serif">'+esc(s.title).slice(0,9)+'</text></svg>';
+}
+function setCover(){
+  const s = SONGS[idx], box = $("csArt");
+  if(s.cover){
+    box.innerHTML = '<img alt="封面" src="'+esc(s.cover)+'">';
+    const im = box.querySelector("img");
+    im.onerror = ()=>{ box.innerHTML = phSVG(idx); };
+  }else{
+    box.innerHTML = phSVG(idx);
+  }
+}
+function camSwap(){
+  const a = $("csArt");
+  a.style.opacity = 0;
+  setTimeout(()=>{ setCover(); a.style.opacity = 1; }, 250);
+}
+/* ---------- 渲染 ---------- */
+function fmt(t){ if(!isFinite(t)) t = 0; t = Math.max(0, Math.round(t)); return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0"); }
+function renderTime(){
+  const s = SONGS[idx];
+  const raw = audio.duration, d = (isFinite(raw) && raw > 0) ? raw : (s.dur || 0), c = audio.currentTime || 0;
+  const pct = d ? Math.min(100, c/d*100) : 0;
+  $("csFill").style.width = pct + "%";
+  $("csKnob").style.left = pct + "%";
+  $("csCur").textContent = fmt(c);
+  $("csRem2").textContent = "REM " + (d ? fmt(d-c) : "--:--");
+  $("shRem").textContent = "REM " + (d ? fmt(d-c) : "--:--");
+}
+function renderAll(){
+  const s = SONGS[idx];
+  $("csTrackNo").textContent = "TRK " + String(idx+1).padStart(2,"0") + "/" + String(SONGS.length).padStart(2,"0");
+  $("camMode").textContent = MODES[mode][1];
+  $("shState").textContent = audio.paused ? "PAUSE" : "PLAY";
+  $("csBpm").textContent = MODES[mode][0];
+  $("csStateTxt").textContent = audio.paused ? "PAUSE" : "PLAY";
+  $("csIcon").className = "cs-icon " + (audio.paused ? "pause" : "play");
+  $("csFile").textContent = s.src ? s.src.split("/").pop().toUpperCase() : "NO FILE";
+  renderTime();
+}
+/* ---------- 播放控制 ---------- */
+function play(){
+  if(!audio.src){ $("csStateTxt").textContent = "先添加歌曲"; return; }
+  ensureGraph();
+  const p = audio.play();
+  if(p && p.catch) p.catch(()=>{ $("csStateTxt").textContent = "按下快门开始"; });
+}
+function toggle(){
+  if(!audio.src){ $("csStateTxt").textContent = "先添加歌曲"; return; }
+  audio.paused ? play() : audio.pause();
+}
+function step(dir, force){
+  const was = force || !audio.paused;
+  let i;
+  if(mode === 2 && SONGS.length > 1){
+    do{ i = Math.floor(Math.random()*SONGS.length); }while(i === idx);
+  } else i = idx + dir;
+  loadTrack(i, was);
+}
+function loadTrack(i, auto){
+  idx = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+  if(SONGS[idx].src) audio.src = SONGS[idx].src;
+  setCover(); camSwap(); renderAll();
+  if(auto && SONGS[idx].src) play();
+}
+audio.addEventListener("ended", ()=>{ if(mode === 1){ audio.currentTime = 0; play(); } else step(mode === 2 ? 0 : 1, true); });
+audio.addEventListener("play", ()=>{ startSpec(); renderAll(); });
+audio.addEventListener("pause", ()=>{ stopSpec(); renderAll(); });
+audio.addEventListener("loadedmetadata", renderTime);
+audio.addEventListener("durationchange", renderTime);
+audio.addEventListener("timeupdate", renderTime);
+audio.addEventListener("error", ()=>{ if(audio.src) $("csFile").textContent = "FILE NOT FOUND"; });
+/* ---------- 预加载下一首：当前歌缓冲稳了之后，后台提前下载下一首音频+封面 ---------- */
+const preCache = {};
+const preAudio = new Audio(); preAudio.preload = "auto";
+function prefetchNext(){
+  if(!SONGS.length) return;
+  const nt = SONGS[(idx + 1) % SONGS.length];
+  if(!nt || !nt.src || preCache[nt.src]) return;
+  preCache[nt.src] = true;
+  preAudio.src = nt.src; preAudio.load();
+  if(nt.cover){ const im = new Image(); im.src = nt.cover; }
+}
+audio.addEventListener("canplaythrough", prefetchNext);
+audio.addEventListener("playing", ()=>{ setTimeout(prefetchNext, 8000); });
+/* ---------- 音频图：声道宽度 + 频谱 ---------- */
+let widenNode = null, widenK = 1, wideIdx = 0;
+const WIDE_STEPS = [{k:1,label:"NORMAL"},{k:1.8,label:"WIDE"},{k:2.6,label:"SUPER"}];
+function ensureGraph(){
+  /* 本地文件直接打开时（file://），浏览器安全机制不允许接入音效通道，
+     此时自动绕开，保证正常出声（无加宽效果）；部署到网站后自动启用。 */
+  if(location.protocol === "file:"){ actx = null; analyser = null; return; }
+  if(actx){ if(actx.state === "suspended") actx.resume(); return; }
+  try{
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    const srcN = actx.createMediaElementSource(audio);
+    const split = actx.createChannelSplitter(2);
+    const merge = actx.createChannelMerger(2);
+    const mid = actx.createGain(); mid.gain.value = 0.5;
+    split.connect(mid, 0); split.connect(mid, 1);
+    const sPos = actx.createGain(); sPos.gain.value = 0.5;
+    const sNeg = actx.createGain(); sNeg.gain.value = -0.5;
+    split.connect(sPos, 0); split.connect(sNeg, 1);
+    const side = actx.createGain(); sPos.connect(side); sNeg.connect(side);
+    widenNode = actx.createGain(); widenNode.gain.value = widenK;
+    side.connect(widenNode);
+    const inv = actx.createGain(); inv.gain.value = -1; widenNode.connect(inv);
+    const oL1 = actx.createGain(), oL2 = actx.createGain();
+    const oR1 = actx.createGain(), oR2 = actx.createGain();
+    mid.connect(oL1); widenNode.connect(oL2);
+    mid.connect(oR1); inv.connect(oR2);
+    oL1.connect(merge, 0, 0); oL2.connect(merge, 0, 0);
+    oR1.connect(merge, 0, 1); oR2.connect(merge, 0, 1);
+    srcN.connect(split);
+    merge.connect(actx.destination);
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 64;
+    fdata = new Uint8Array(analyser.frequencyBinCount);
+    merge.connect(analyser);
+  }catch(e){ actx = null; analyser = null; }
+}
+/* ---------- 频谱（本地打开走模拟动画，部署后自动变真频谱） ---------- */
+function startSpec(){ if(raf) return; const loop = ()=>{ drawSpec(); raf = requestAnimationFrame(loop); }; raf = requestAnimationFrame(loop); }
+function stopSpec(){ if(raf){ cancelAnimationFrame(raf); raf = null; } drawFlat(); }
+function drawSpec(){
+  sg.clearRect(0,0,52,32);
+  const N = 12, bw = 52/N;
+  for(let i=0;i<N;i++){
+    let v;
+    if(actx && actx.state === "suspended") actx.resume();
+    if(analyser && fdata){
+      analyser.getByteFrequencyData(fdata);
+      v = fdata[Math.floor(i*fdata.length/N*0.8)]/255;
+    } else{
+      const t = performance.now()/1000;
+      const env = Math.exp(-i/N*1.5);
+      v = env*(0.45 + 0.3*Math.sin(t*2.3 + i*1.1) + 0.22*Math.sin(t*3.9 + i*2.3) + 0.08*Math.random());
+    }
+    v = Math.max(0.06, Math.min(1, v));
+    const h = v*26;
+    sg.fillStyle = "rgba(255,255,255,.75)";
+    sg.fillRect(i*bw+1.5, 30-h, bw-3, h);
+  }
+}
+function drawFlat(){
+  sg.clearRect(0,0,52,32);
+  sg.fillStyle = "rgba(255,255,255,.35)";
+  const N = 12, bw = 52/N;
+  for(let i=0;i<N;i++) sg.fillRect(i*bw+1.5, 27, bw-3, 2.5);
+}
+/* ---------- DISP 三档信息密度 ---------- */
+function applyDisp(){
+  const sc = $("camScreen");
+  sc.classList.remove("disp-min","disp-none");
+  if(disp === 1) sc.classList.add("disp-min");
+  if(disp === 2) sc.classList.add("disp-none");
+}
+/* ---------- 屏幕照片双指缩放：捏合放大 · 放大后拖动 · 双击或滚轮复原 ---------- */
+(function(){
+  const stage = document.querySelector(".cs-photo");
+  const art = $("csArt");
+  if(!stage || !art) return;
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  let sc=1, tx=0, ty=0, base=1, bx=0, by=0, d0=0, pinch=false, pan=false, lastTap=0;
+  const target = ()=>art.firstElementChild;
+  function apply(){
+    const el = target(); if(!el) return;
+    el.style.transition = pinch ? "none" : "transform .18s ease-out";
+    el.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + sc + ")";
+  }
+  function reset(){ sc=1; tx=0; ty=0; apply(); }
+  function dist(ts){ const dx=ts[0].clientX-ts[1].clientX, dy=ts[0].clientY-ts[1].clientY; return Math.hypot(dx,dy); }
+  stage.addEventListener("touchstart",function(e){
+    if(e.touches.length===2){
+      pinch=true; pan=false; base=sc; bx=tx; by=ty; d0=dist(e.touches); apply();
+    } else if(e.touches.length===1 && sc>1){
+      pan=true; bx=e.touches[0].clientX; by=e.touches[0].clientY;
+    }
+  },{passive:true});
+  stage.addEventListener("touchmove",function(e){
+    if(pinch && e.touches.length===2){
+      e.preventDefault();
+      sc = clamp(base*dist(e.touches)/d0, 1, 4); apply();
+    } else if(pan && e.touches.length===1 && sc>1){
+      e.preventDefault();
+      const lim = (sc-1)/2;
+      tx = clamp(tx + (e.touches[0].clientX-bx), -lim*stage.clientWidth, lim*stage.clientWidth);
+      ty = clamp(ty + (e.touches[0].clientY-by), -lim*stage.clientHeight, lim*stage.clientHeight);
+      bx = e.touches[0].clientX; by = e.touches[0].clientY; apply();
+    }
+  },{passive:false});
+  stage.addEventListener("touchend",function(e){
+    if(e.touches.length<2){ pinch=false; }
+    if(e.touches.length===0){
+      pan=false;
+      const now = Date.now();
+      if(now-lastTap < 300){ reset(); lastTap=0; } else lastTap=now;
+    }
+  });
+  stage.addEventListener("dblclick",function(e){ e.preventDefault(); reset(); });
+  stage.addEventListener("wheel",function(e){
+    e.preventDefault();
+    sc = clamp(sc*(e.deltaY<0?1.15:0.87), 1, 4);
+    if(sc===1){ tx=0; ty=0; }
+    apply();
+  },{passive:false});
+})();
+
+/* ---------- 开机动画：背屏 LOGO 光斑 + 肩屏启动 ---------- */
+function bootCam(){
+  const b = $("camBoot"), sh = $("shBoot");
+  b.classList.remove("on","off");
+  sh.classList.remove("on");
+  setTimeout(()=>b.classList.add("on"), 80);
+  setTimeout(()=>sh.classList.add("on"), 150);
+  setTimeout(()=>{ b.classList.add("off"); sh.classList.remove("on"); renderAll(); }, 1700);
+}
+/* ---------- 初始化 ---------- */
+function init(){
+  setCover(); renderAll(); applyDisp();
+  $("shutter").onclick = toggle;
+  $("camPwr").onclick = bootCam;
+  $("csDisp").onclick = ()=>{ disp = (disp+1)%3; applyDisp(); };
+  $("csPrev").onclick = ()=>step(-1);
+  $("csNext").onclick = ()=>step(1);
+  /* LOOP 键：点按 = 切循环模式；长按一秒 = 切声道宽度 */
+  let lpTimer = null, lpLong = false;
+  function lpStart(){
+    lpLong = false;
+    lpTimer = setTimeout(()=>{
+      lpLong = true;
+      wideIdx = (wideIdx + 1) % WIDE_STEPS.length;
+      widenK = WIDE_STEPS[wideIdx].k;
+      if(widenNode) widenNode.gain.value = widenK;
+      const el = $("csBpm"); el.textContent = WIDE_STEPS[wideIdx].label;
+      setTimeout(()=>{ el.textContent = MODES[mode][0]; }, 1600);
+      if(actx && actx.state === "suspended") actx.resume();
+    }, 600);
+  }
+  function lpEnd(){
+    clearTimeout(lpTimer);
+    if(!lpLong){ mode = (mode+1)%3; renderAll(); }
+  }
+  $("csMode").addEventListener("touchstart", e=>{ e.preventDefault(); lpStart(); });
+  $("csMode").addEventListener("touchend", e=>{ e.preventDefault(); lpEnd(); });
+  $("csMode").addEventListener("mousedown", lpStart);
+  $("csMode").addEventListener("mouseup", lpEnd);
+  specC.width = 104; specC.height = 64; sg.scale(2,2);
+  drawFlat();
+  if(SONGS[0].src){ audio.src = SONGS[0].src; audio.load(); }
+  setTimeout(bootCam, 500);
+}
+init();
+
+/* ---------- 线控耳机（MediaSession，三个播放器通用） ---------- */
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play', function(){ play(); });
+  navigator.mediaSession.setActionHandler('pause', function(){ audio.pause(); });
+  navigator.mediaSession.setActionHandler('previoustrack', function(){ step(-1, true); });
+  navigator.mediaSession.setActionHandler('nexttrack', function(){ step(1, true); });
+}
+</script>
+</body>
+</html>
