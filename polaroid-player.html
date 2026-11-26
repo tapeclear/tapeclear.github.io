@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拍立得播放器 · INSTA-50</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0e0f12;background-image:radial-gradient(1000px 620px at 50% -10%,#1a1c22,transparent);color:#e8e6e0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:26px 16px 56px}
+header{text-align:center;margin-bottom:18px}
+header h1{font-size:19px;font-weight:700;letter-spacing:1px;color:#f2efe8}
+header .sub{margin-top:7px;font-size:13px;color:#8d8b85}
+.pol{width:344px;max-width:100%}
+
+/* 相纸探出区：照片从机身顶缝"吐出" */
+.film-zone{height:258px;overflow:hidden;position:relative;margin:0 30px}
+.pol-photo{position:absolute;left:0;right:0;bottom:0;background:#fbf8f0;padding:10px 10px 0;border-radius:2px;box-shadow:0 14px 26px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.2);transform:translateY(272px);opacity:0;transition:transform 1.05s cubic-bezier(.18,.85,.25,1.08),opacity .5s ease}
+.pol-photo.on{transform:translateY(0);opacity:1}
+.pol-photo.fast{transition-duration:.4s,.25s}
+.pol-cover{aspect-ratio:4/3;background:#151515;overflow:hidden}
+.pol-cover img,.pol-cover svg{width:100%;height:100%;object-fit:cover;display:block}
+.pol-cap{height:26px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:10px;color:#6d6759;font-family:Georgia,serif;font-style:italic;white-space:nowrap;overflow:hidden}
+.pol-cap .stamp{font-style:normal;color:#a8a091;font-size:9px;letter-spacing:1px}
+
+/* 机身 */
+.pol-body{background:linear-gradient(180deg,#f7ecd2 0%,#eeddb8 60%,#e2cb9d 100%);border-radius:26px 26px 34px 34px;border:1px solid #cdb98f;box-shadow:inset 0 2px 0 rgba(255,255,255,.8),inset 0 -3px 0 rgba(122,94,44,.12),0 30px 50px rgba(0,0,0,.45);position:relative;padding-bottom:18px;overflow:hidden}
+.pol-slot{height:10px;margin:0 30px;background:linear-gradient(180deg,#020202,#1e1e1e);border-radius:0 0 8px 8px;box-shadow:inset 0 3px 5px #000;position:relative}
+.pol-slot::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:rgba(255,255,255,.14)}
+
+/* 黑色前面板 */
+.pol-face{margin:12px 14px 0;background:linear-gradient(180deg,#2b2b2e,#191a1c 70%,#202124);border-radius:16px;padding:14px 14px 16px;border:1px solid #000;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.flash{position:absolute;top:14px;left:14px;width:62px;height:42px;border-radius:8px;border:2px solid #0a0a0a;background:radial-gradient(circle at 50% 45%,#eef2f6 0%,#c3ccd6 55%,#8f99a5 100%);box-shadow:inset 0 0 6px rgba(255,255,255,.7)}
+.flash::after{content:"";position:absolute;inset:3px;border-radius:5px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.4) 0 2px,transparent 2px 6px)}
+.flash.flashy{animation:flashbang .5s linear 2}
+@keyframes flashbang{
+  0%{background:#fff;box-shadow:0 0 36px 12px rgba(255,255,255,.95),inset 0 0 10px #fff}
+  22%{background:radial-gradient(circle at 50% 45%,#eef2f6 0%,#c3ccd6 55%,#8f99a5 100%);box-shadow:inset 0 0 6px rgba(255,255,255,.7)}
+  50%{background:#fff;box-shadow:0 0 36px 12px rgba(255,255,255,.95),inset 0 0 10px #fff}
+  100%{background:radial-gradient(circle at 50% 45%,#eef2f6 0%,#c3ccd6 55%,#8f99a5 100%);box-shadow:inset 0 0 6px rgba(255,255,255,.7)}
+}
+.charge{position:absolute;top:24px;left:88px;width:9px;height:9px;border-radius:50%;background:#4d4d46;box-shadow:inset 0 1px 2px #000;transition:background .3s,box-shadow .3s}
+.charge.ok{background:#8fd44a;box-shadow:0 0 9px rgba(143,212,74,.75),inset 0 1px 1px rgba(255,255,255,.5)}
+.viewfinder{position:absolute;top:14px;right:14px;width:36px;height:27px;border-radius:6px;background:#0b0f14;border:2px solid #000;box-shadow:inset 0 0 0 2px #2a3540}
+.viewfinder::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border:1px solid #3f5568;border-radius:50%}
+
+/* 镜头 + 镜头盖 */
+.lens{width:118px;height:118px;border-radius:50%;margin:64px auto 0;position:relative;background:radial-gradient(circle at 42% 36%,#3d434b,#1a1d22 60%,#0c0e11);border:3px solid #050608;box-shadow:0 6px 14px rgba(0,0,0,.5),inset 0 2px 4px rgba(255,255,255,.12)}
+.lens::before{content:"";position:absolute;inset:14px;border-radius:50%;border:2px solid #3a414b;box-shadow:0 0 0 3px #101318}
+.lens-cap{position:absolute;inset:5px;border-radius:50%;background:#111216;z-index:2;display:flex;align-items:center;justify-content:center;color:#4a505b;font-size:9px;letter-spacing:3px;font-family:Georgia,serif;box-shadow:inset 0 0 0 3px #1e2126,inset 0 0 14px #000;transition:transform .5s ease,opacity .45s ease}
+.lens-cap.open{transform:translateY(-26px) scale(.82);opacity:0}
+.lens-core{position:absolute;inset:30px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#2d3844,#0a0d12 72%);box-shadow:inset 0 0 0 3px #14181e,inset 0 0 14px #000}
+.lens-core::after{content:"";position:absolute;left:30%;top:24%;width:14px;height:8px;border-radius:50%;background:rgba(190,210,235,.28);transform:rotate(-28deg)}
+
+/* 暗绿信息屏：只显示，不可点 */
+.mini-lcd{margin:16px auto 0;width:218px;max-width:100%;background:#131f10;border-radius:6px;padding:9px 10px 7px;font-family:"Courier New",ui-monospace,monospace;color:#b9e14f;text-shadow:0 0 6px rgba(185,225,79,.5);box-shadow:inset 0 0 18px rgba(0,0,0,.75),inset 0 0 0 1px rgba(185,225,79,.12);position:relative;overflow:hidden;pointer-events:none}
+.mini-lcd::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px)}
+.lcd-boot{position:absolute;inset:0;background:#131f10;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:opacity .5s;pointer-events:none;letter-spacing:4px}
+.lcd-boot.off{opacity:0}
+.lcd-boot .big{font-size:15px;font-weight:700}
+.lcd-boot .small{font-size:8px;opacity:.65;letter-spacing:2px}
+.mr{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mr .t{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:1px}
+.mr .m{font-size:10px;border:1px solid rgba(185,225,79,.4);padding:1px 6px;border-radius:3px;flex:none;background:rgba(185,225,79,.1)}
+.mspec{display:block;width:100%;height:10px;margin:7px 0 3px}
+.mgrid{display:flex;gap:2px}
+.mgrid i{flex:1;height:7px;background:rgba(185,225,79,.14);border-radius:1px}
+.mgrid i.fill{background:#b9e14f;box-shadow:0 0 4px rgba(185,225,79,.6)}
+.mtime{display:flex;justify-content:space-between;font-size:9px;opacity:.8;margin-top:4px;letter-spacing:1px}
+
+/* 实体操作区：拨杆 / 快门 / MODE */
+.ctl{display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-top:16px}
+.ctl-col{display:flex;flex-direction:column;align-items:center;gap:7px}
+.ctl-col .tag-s{font-size:8px;color:#8b8b85;letter-spacing:1.5px;margin-top:1px}
+.lever{width:46px;height:26px;border-radius:6px;background:linear-gradient(180deg,#3e3e41,#232326);border:1px solid #000;color:#cfcfcf;font-size:11px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.16);font-family:inherit}
+.lever:active{transform:translateY(2px);background:#181819}
+.shutter-btn{width:58px;height:58px;border-radius:50%;border:3px solid #0a0a0a;cursor:pointer;background:radial-gradient(circle at 38% 30%,#d8dde2,#9aa1a9 55%,#5f666e);box-shadow:0 4px 10px rgba(0,0,0,.55),inset 0 2px 3px rgba(255,255,255,.5),inset 0 -3px 6px rgba(0,0,0,.3);position:relative;flex:none}
+.shutter-btn::after{content:"";position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#4a5158,#262b31);box-shadow:inset 0 1px 2px rgba(255,255,255,.25)}
+.shutter-btn:active{transform:translateY(2px) scale(.97)}
+.shutter-label{margin-top:7px;text-align:center;font-size:8px;color:#8b8b85;letter-spacing:2px}
+
+/* 机身底缘 */
+.pol-foot{display:flex;align-items:center;justify-content:space-between;margin:14px 24px 0}
+.pol-brand{font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:15px;letter-spacing:2px;color:#6f6a5e}
+.pol-foot .r{display:flex;align-items:center;gap:10px}
+.pol-foot .slogan{font-size:9px;color:#a8a294;letter-spacing:1.5px}
+.pwr-btn{width:36px;height:22px;border-radius:11px;background:linear-gradient(180deg,#3e3e41,#232326);border:1px solid #000;color:#cfcfcf;font-size:8px;letter-spacing:1px;cursor:pointer;font-family:inherit;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.16)}
+.pwr-btn:active{transform:translateY(1px)}
+
+.hint{margin-top:22px;font-size:12px;color:#8d8b85;max-width:430px;text-align:center;line-height:1.9}
+.hint b{color:#c9c6be}
+
+/* 手机窄屏适配 */
+@media (max-width:480px){
+  body{padding:20px 10px 44px}
+  header h1{font-size:16px}
+  header .sub{font-size:11px}
+  .pol{width:100%;max-width:360px}
+  .film-zone{height:280px;margin:0 24px}
+  .pol-slot{height:8px;margin:0 24px}
+  .pol-photo{box-shadow:0 9px 16px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2)}
+  .pol-face{margin:10px 10px 0;padding:12px 10px 14px}
+  .flash{width:54px;height:36px;top:12px;left:12px}
+  .charge{left:76px;top:20px}
+  .viewfinder{width:32px;height:24px;top:12px;right:12px}
+  .lens{width:106px;height:106px;margin-top:56px}
+  .lens-core{inset:27px}
+  .mini-lcd{width:200px;margin-top:14px}
+  .ctl{padding:0 10px;margin-top:14px}
+  .shutter-btn{width:52px;height:52px}
+  .shutter-btn::after{inset:8px}
+  .hint{font-size:11px}
+}
+</style>
+</head>
+<script src="data.js"></script>
+<body>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   ★ 歌曲配置区 ★ —— 你只需要改这里！
+
+   1. 把你的音频文件（mp3 / m4a / wav / flac / ogg）和封面图
+      （jpg / png / webp）复制到本网页同一个文件夹里；
+   2. 下面每首歌照着格式改：src 填音频文件名，cover 填封面
+      图片名；歌的数量随意增减，每首之间用逗号隔开；
+   3. cover 不填则显示自动生成的占位封面；时长不用填，
+      会自动读取。
+   ════════════════════════════════════════════════════════ */
+/* 歌单统一从 data.js 读取（和随身听共用一份） */
+const SONGS = (window.PLAYLIST || []).map(function(s){
+  return {
+    title: s.title,
+    artist: s.artist || '',
+    src: s.file,
+    cover: s.cover || ''
+  };
+});
+  
+/* 装饰性频谱开关（部署到网站后想开真频谱再改成 true） */
+const USE_REAL_SPECTRUM = false;
+/* ═══════════════════ 配置区结束 ═════════════════════════ */
+</script>
+
+<header>
+  <h1>拍立得播放器 · INSTA-50</h1>
+  <p class="sub">1:1 复刻 2000 年代日系拍立得：只有快门、拨杆和 MODE —— 暗绿屏只显示信息，不能点</p>
+</header>
+
+<div class="pol">
+
+  <div class="film-zone">
+    <div class="pol-photo" id="polPhoto">
+      <div class="pol-cover" id="polCover"></div>
+      <div class="pol-cap" id="polCap"></div>
+    </div>
+  </div>
+
+  <div class="pol-body">
+    <div class="pol-slot"></div>
+    <div class="pol-face">
+      <div class="flash" id="flash"></div>
+      <div class="charge" id="charge"></div>
+      <div class="viewfinder"></div>
+
+      <div class="lens">
+        <div class="lens-cap" id="lensCap">INSTA</div>
+        <div class="lens-core"></div>
+      </div>
+
+      <div class="mini-lcd">
+        <div class="lcd-boot" id="lcdBoot"><span class="big">INSTA-50</span><span class="small">MINI MUSIC EDITION</span></div>
+        <div class="mr"><span class="t" id="lcdTitle">♪ —</span><span class="m" id="lcdMode">LOOP-A</span></div>
+        <canvas class="mspec" id="spec"></canvas>
+        <div class="mgrid" id="mGrid"></div>
+        <div class="mtime"><span id="lcdCur">00:00</span><span id="lcdDur">--:--</span></div>
+      </div>
+
+      <div class="ctl">
+        <div class="ctl-col">
+          <button class="lever" id="levUp" title="下一首">▲</button>
+          <button class="lever" id="levDn" title="上一首">▼</button>
+          <span class="tag-s">TRACK</span>
+        </div>
+        <div>
+          <button class="shutter-btn" id="shutterBtn" title="播放 / 暂停" aria-label="快门：播放或暂停"></button>
+          <div class="shutter-label">SHUTTER</div>
+        </div>
+        <div class="ctl-col">
+          <button class="lever" id="modeBtn" title="切换循环模式">MODE</button>
+          <span class="tag-s">LOOP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pol-foot">
+      <span class="pol-brand">INSTA-50</span>
+      <span class="r"><span class="slogan">instant music</span><button class="pwr-btn" id="pwrBtn" title="重播开机动画">PWR</button></span>
+    </div>
+  </div>
+
+</div>
+
+<p class="hint"><b>操作</b>：快门大钮 = 播放 / 暂停 · ▲▼拨杆 = 切歌 · MODE = 循环模式 · PWR = 重播开机</p>
+
+<script>
+const $ = id => document.getElementById(id);
+const audio = new Audio();
+audio.preload = "metadata";
+let idx = 0, mode = 0, raf = null, actx = null, analyser = null, fdata = null;
+const MODES = ["LOOP-A", "LOOP-1", "RND"];
+const PH = [["#2e6e4e","#e9e4d5"],["#4a2a6a","#f2e8ff"],["#e07840","#f6ead8"],["#101828","#9fd8ff"],["#8a3a3a","#f6dede"],["#3a5a8a","#dce8f6"]];
+const photo = $("polPhoto");
+const specC = $("spec"), sg = specC.getContext("2d");
+const N = 20;
+let cells = [];
+
+/* ---------- 封面 ---------- */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function phSVG(s, i){
+  const c = PH[i % PH.length];
+  return '<svg viewBox="0 0 100 75" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="75" fill="'+c[0]+'"/><circle cx="50" cy="32" r="13" fill="none" stroke="'+c[1]+'" stroke-width="2.5" opacity=".9"/><circle cx="50" cy="32" r="5.5" fill="'+c[1]+'" opacity=".9"/><text x="50" y="62" text-anchor="middle" font-size="8" fill="'+c[1]+'" font-family="sans-serif">'+esc(s.title).slice(0,10)+'</text></svg>';
+}
+function setCover(){
+  const s = SONGS[idx], box = $("polCover");
+  if(s.cover){
+    box.innerHTML = '<img alt="封面" src="' + esc(s.cover) + '">';
+    const im = box.querySelector("img");
+    im.onerror = () => { box.innerHTML = phSVG(s, idx); };
+  } else {
+    box.innerHTML = phSVG(s, idx);
+  }
+  const d = new Date();
+  const mm = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][d.getMonth()];
+  $("polCap").innerHTML = '<span class="stamp">' + String(d.getFullYear()).slice(2) + "·" + mm + "·" + d.getDate() + "</span> " + esc(s.title) + " — " + esc(s.artist || "");
+}
+
+/* ---------- 进度与渲染 ---------- */
+function fmt(t){
+  if(!isFinite(t)) t = 0;
+  t = Math.max(0, Math.round(t));
+  return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0");
+}
+function renderTime(){
+  const d = audio.duration || 0, c = audio.currentTime || 0;
+  const pct = d ? Math.min(100, c/d*100) : 0;
+  const n = Math.round(pct/100*cells.length);
+  cells.forEach((el,i)=>el.classList.toggle("fill", i<n));
+  $("lcdCur").textContent = fmt(c);
+  $("lcdDur").textContent = d ? fmt(d) : "--:--";
+}
+function renderAll(){
+  const s = SONGS[idx];
+  $("lcdTitle").textContent = "♪ " + s.title;
+  $("lcdMode").textContent = MODES[mode];
+  renderTime();
+}
+
+/* ---------- 播放控制 ---------- */
+function loadTrack(i, auto){
+  idx = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+  if(SONGS[idx].src) audio.src = SONGS[idx].src;
+  photoSwap();
+  renderAll();
+  if(auto) play();
+}
+function play(){
+  if(!audio.src){ $("lcdTitle").textContent = "♪ 请先添加歌曲"; return; }
+  ensureGraph();
+  if(!actx && location.protocol === "file:"){ /* 本地模式：无加宽 */ }
+  if(actx && actx.state === "suspended"){
+    actx.resume().then(()=>{
+      $("lcdTitle").textContent = "♪ 唤醒成功，再按一次快门";
+    }).catch(()=>{
+      $("lcdTitle").textContent = "♪ 唤醒失败 " + actx.state;
+    });
+  }
+  const p = audio.play();
+  if(p && p.catch) p.catch(()=>{ $("lcdTitle").textContent = "♪ 请再按一次快门"; });
+}
+function toggle(){
+  if(!audio.src){ loadTrack(0, true); return; }
+  audio.paused ? play() : audio.pause();
+}
+function step(dir, force){
+  const was = force || !audio.paused;
+  let i;
+  if(mode === 2 && SONGS.length > 1){
+    do{ i = Math.floor(Math.random()*SONGS.length); }while(i === idx);
+  } else {
+    i = idx + dir;
+  }
+  loadTrack(i, was);
+}
+function photoSwap(){
+  photo.classList.add("fast");
+  photo.classList.remove("on");
+  setTimeout(()=>{
+    setCover();
+    photo.classList.add("on");
+    setTimeout(()=>photo.classList.remove("fast"), 450);
+  }, 280);
+}
+audio.addEventListener("ended", ()=>{
+  if(mode === 1){ audio.currentTime = 0; play(); }
+  else if(mode === 0){ loadTrack(idx + 1, true); }
+  else { step(1, true); }
+});
+audio.addEventListener("play", ()=>{ startSpec(); renderAll(); });
+audio.addEventListener("pause", ()=>{ stopSpec(); renderAll(); });
+audio.addEventListener("loadedmetadata", renderAll);
+audio.addEventListener("timeupdate", renderTime);
+audio.addEventListener("error", ()=>{ if(audio.src) $("lcdTitle").textContent = "♪ 音频加载失败"; });
+
+/* ---------- 频谱（默认装饰性动画） ---------- */
+/* ---------- 音频图：声道宽度 + 真频谱 ---------- */
+let widenNode = null, widenK = 1, wideIdx = 0;
+const WIDE_STEPS = [{k:1,label:"NORMAL"},{k:1.8,label:"WIDE"},{k:2.6,label:"SUPER"}];
+function ensureGraph(){
+   if(location.protocol === "file:"){ actx = null; analyser = null; return; }
+   if(actx){ if(actx.state === "suspended") actx.resume(); return; }
+  try{
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    const srcN = actx.createMediaElementSource(audio);
+    const split = actx.createChannelSplitter(2);
+    const merge = actx.createChannelMerger(2);
+    const mid = actx.createGain(); mid.gain.value = 0.5;
+    split.connect(mid, 0); split.connect(mid, 1);
+    const sPos = actx.createGain(); sPos.gain.value = 0.5;
+    const sNeg = actx.createGain(); sNeg.gain.value = -0.5;
+    split.connect(sPos, 0); split.connect(sNeg, 1);
+    const side = actx.createGain(); sPos.connect(side); sNeg.connect(side);
+    widenNode = actx.createGain(); widenNode.gain.value = widenK;
+    side.connect(widenNode);
+    const inv = actx.createGain(); inv.gain.value = -1; widenNode.connect(inv);
+    const oL1 = actx.createGain(), oL2 = actx.createGain();
+    const oR1 = actx.createGain(), oR2 = actx.createGain();
+    mid.connect(oL1); widenNode.connect(oL2);
+    mid.connect(oR1); inv.connect(oR2);
+    oL1.connect(merge, 0, 0); oL2.connect(merge, 0, 0);
+    oR1.connect(merge, 0, 1); oR2.connect(merge, 0, 1);
+    srcN.connect(split);
+    merge.connect(actx.destination);
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 64;
+    fdata = new Uint8Array(analyser.frequencyBinCount);
+    merge.connect(analyser);
+  }catch(e){ actx = null; analyser = null; }
+}
+function startSpec(){
+  if(raf) return;
+  const loop = ()=>{ drawSpec(); raf = requestAnimationFrame(loop); };
+  raf = requestAnimationFrame(loop);
+}
+function stopSpec(){
+  if(raf){ cancelAnimationFrame(raf); raf = null; }
+  drawFlat();
+}
+function drawFlat(){
+  const W = specC.width, H = specC.height;
+  sg.clearRect(0,0,W,H);
+  sg.fillStyle = "rgba(185,225,79,.3)";
+  const bw = W/N;
+  for(let i=0;i<N;i++) sg.fillRect(i*bw+2, H-4, bw-4, 2);
+}
+function drawSpec(){
+  const W = specC.width, H = specC.height;
+  sg.clearRect(0,0,W,H);
+  const bw = W/N, t = performance.now()/1000;
+  for(let i=0;i<N;i++){
+    let v;
+    if(analyser && fdata){
+      v = fdata[Math.floor(i*fdata.length/N*0.8)] / 255;
+    } else {
+      const env = Math.exp(-i/N*1.5);
+      v = env * (0.42 + 0.3*Math.sin(t*2.3 + i*1.1) + 0.22*Math.sin(t*3.9 + i*2.3) + 0.10*Math.random());
+    }
+    v = Math.max(0.04, Math.min(1, v));
+    sg.fillStyle = audio.paused ? "rgba(185,225,79,.3)" : "rgba(185,225,79,.9)";
+    sg.fillRect(i*bw+2, H-2-v*(H-3), bw-4, v*(H-3));
+  }
+}
+
+/* ---------- 开机：镜头盖滑开 → 闪光灯连闪 → 吐片 → 屏亮 ---------- */
+function bootPol(){
+  $("lensCap").classList.remove("open");
+  $("flash").classList.remove("flashy");
+  $("charge").classList.remove("ok");
+  $("lcdBoot").classList.remove("off");
+  photo.classList.remove("on");
+  void document.body.offsetWidth;   /* 重置 CSS 动画 */
+  setTimeout(()=>$("lensCap").classList.add("open"), 500);
+  setTimeout(()=>{
+    $("flash").classList.add("flashy");
+    $("charge").classList.add("ok");
+  }, 950);
+  setTimeout(()=>photo.classList.add("on"), 1700);
+  setTimeout(()=>$("lcdBoot").classList.add("off"), 2550);
+}
+
+/* ---------- 初始化 ---------- */
+function init(){
+  const grid = $("mGrid");
+  for(let i=0;i<18;i++){ const c=document.createElement("i"); grid.appendChild(c); cells.push(c); }
+  setCover(); renderAll();
+  $("shutterBtn").onclick = toggle;
+  $("levUp").onclick = ()=>step(1);
+  $("levDn").onclick = ()=>step(-1);
+     let lpTimer = null, lpLong = false;
+    function pressStart(){
+      lpLong = false;
+      lpTimer = setTimeout(()=>{
+        lpLong = true;
+        wideIdx = (wideIdx + 1) % WIDE_STEPS.length;
+        widenK = WIDE_STEPS[wideIdx].k;
+        if(widenNode) widenNode.gain.value = widenK;
+        const el = $("lcdMode"); el.textContent = WIDE_STEPS[wideIdx].label;
+        setTimeout(()=>{ el.textContent = MODES[mode]; }, 1600);
+        if(actx && actx.state === "suspended") actx.resume();
+      }, 600);
+    }
+    function pressEnd(){
+      clearTimeout(lpTimer);
+      if(!lpLong){ mode = (mode + 1) % 3; renderAll(); }
+    }
+    $("modeBtn").addEventListener("touchstart", e=>{ e.preventDefault(); pressStart(); });
+    $("modeBtn").addEventListener("touchend", e=>{ e.preventDefault(); pressEnd(); });
+    $("modeBtn").addEventListener("mousedown", pressStart);
+    $("modeBtn").addEventListener("mouseup", pressEnd);
+  $("pwrBtn").onclick = bootPol;
+  specC.width = (specC.clientWidth || 198) * 2; specC.height = 20;
+  drawFlat();
+  if(SONGS[0].src){ audio.src = SONGS[0].src; audio.load(); }
+  setTimeout(bootPol, 500);
+}
+init();
+
+/* ---------- 线控耳机（MediaSession，三个播放器通用） ---------- */
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play', function(){ play(); });
+  navigator.mediaSession.setActionHandler('pause', function(){ audio.pause(); });
+  navigator.mediaSession.setActionHandler('previoustrack', function(){ step(-1, true); });
+  navigator.mediaSession.setActionHandler('nexttrack', function(){ step(1, true); });
+}
+</script>
+</body>
+</html>

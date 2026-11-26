@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TAPE CLEAR</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff6ec7'/%3E%3Cstop offset='1' stop-color='%238a4fff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Crect x='10' y='25' width='80' height='50' rx='8' fill='%23fff' opacity='.92'/%3E%3Crect x='22' y='38' width='56' height='22' rx='11' fill='%232b1f6e'/%3E%3Ccircle cx='34' cy='49' r='7' fill='%23ff6ec7'/%3E%3Ccircle cx='66' cy='49' r='7' fill='%23ff6ec7'/%3E%3Crect x='30' y='80' width='40' height='4' rx='2' fill='%23fff' opacity='.8'/%3E%3C/svg%3E">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; overflow:hidden; font-family:"MS PGothic","SimHei",sans-serif; }
+body { background:#000; }
+#phone { height:100%; max-width:480px; margin:0 auto; display:flex; flex-direction:column; background:linear-gradient(160deg,#2a2a3a,#14141f); position:relative; border-left:1px solid #444; border-right:1px solid #444; }
+#statusbar { height:34px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 12px; font-size:12px; color:#cfd2ff; background:linear-gradient(#3a3a55,#22222f); border-bottom:1px solid #555; letter-spacing:1px; }
+#clock { font-weight:bold; }
+
+/* ===== 待机时钟 ===== */
+#standby { position:absolute; inset:34px 0 0 0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
+  background: radial-gradient(circle at 30% 25%, rgba(160,120,255,.3), transparent 55%),
+              radial-gradient(circle at 72% 72%, rgba(255,110,190,.28), transparent 55%),
+              linear-gradient(160deg,#1c1c2e,#101018); }
+#standby .bigtime { font-size:56px; font-weight:bold; letter-spacing:3px; color:#f2f0ff; text-shadow:0 0 24px rgba(180,140,255,.9); }
+#standby .date { font-size:15px; margin-top:14px; color:#c9c4f5; }
+#standby .hint { font-size:13px; margin-top:40px; color:#9d8fd8; letter-spacing:3px; animation:blink 1.8s step-end infinite; }
+@keyframes blink { 50% { opacity:0; } }
+
+#desktop { flex:1; overflow-y:auto; padding:16px 12px;
+  background: radial-gradient(circle at 30% 20%, rgba(160,120,255,.25), transparent 55%),
+              radial-gradient(circle at 75% 70%, rgba(255,110,190,.22), transparent 55%),
+              linear-gradient(160deg,#1c1c2e,#101018); }
+.grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px 6px; }
+.app { display:flex; flex-direction:column; align-items:center; cursor:pointer; user-select:none; }
+.app:active .icon { transform:scale(.9); filter:brightness(1.35); }
+.icon { width:100%; aspect-ratio:1/1; max-width:76px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:34px;
+  border:1px solid rgba(255,255,255,.5); box-shadow:0 4px 10px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.6); position:relative; overflow:hidden; transition:transform .15s; }
+.icon::after { content:""; position:absolute; left:0; top:0; width:100%; height:45%; background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,.05)); border-radius:16px 16px 60% 60%; }
+.appname { margin-top:7px; font-size:13px; color:#f2f0ff; text-align:center; text-shadow:0 1px 3px #000; line-height:1.3; font-weight:bold; }
+
+.c-red { background:linear-gradient(135deg,#e8484f,#f6f1e6); }
+.c-purple { background:linear-gradient(135deg,#2b1f6e,#6a5cff); }
+.c-vp { background:linear-gradient(135deg,#7b3fe4,#ff5fb0); }
+.c-y2k { background:linear-gradient(135deg,#ff6ec7,#8a4fff); }
+.c-fake { background:linear-gradient(135deg,#3a3a55,#55556f); }
+
+/* ===== 回到未来：全息投影仪图标 ===== */
+.c-holo { background:linear-gradient(135deg,#0e2f4d,#1e5c8a); }
+.icon-holo-svg { width:66%; height:66%; display:block; filter:drop-shadow(0 0 6px rgba(140,220,255,.8)); }
+.icon-holo-svg .holoscr { animation:holoGlow 2.6s ease-in-out infinite; }
+@keyframes holoGlow { 0%,100% { opacity:.55; } 50% { opacity:1; } }
+
+/* ===== 相机三机位图标 ===== */
+.c-cam1 { background:linear-gradient(135deg,#3d3d55,#6a6a8f); }  /* VEROX-7 银黑相机 */
+.c-cam2 { background:linear-gradient(135deg,#e8e4dc,#9fb8ad); }  /* 拍立得 奶油绿 */
+.c-cam3 { background:linear-gradient(135deg,#1a1a22,#3a3a4c); }  /* 尼康 单反黑 */
+.icon-cam-svg { width:70%; height:70%; display:block; filter:drop-shadow(0 0 5px rgba(255,255,255,.45)); }
+.icon-cam-svg .flash { animation:camGlow 2.4s ease-in-out infinite; }
+@keyframes camGlow { 0%,100% { opacity:.4; } 50% { opacity:1; } }
+
+#loading { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; background:rgba(8,8,16,.92); }
+.spinner { width:46px; height:46px; border-radius:50%; border:5px solid rgba(180,160,255,.25); border-top-color:#b39dff; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#loading p { margin-top:16px; color:#c9c4f5; font-size:14px; letter-spacing:2px; }
+#view { position:absolute; inset:0; z-index:40; display:none; background:#000; }
+#view iframe { width:100%; height:100%; border:0; }
+#backbtn { position:absolute; right:14px; bottom:16px; z-index:60; padding:11px 20px; font-size:15px; letter-spacing:2px; color:#fff; cursor:pointer; user-select:none;
+  background:linear-gradient(135deg,#4a4a6e,#2a2a44); border:1px solid rgba(255,255,255,.5); border-radius:22px;
+  box-shadow:0 3px 10px rgba(0,0,0,.6), inset 0 1px 2px rgba(255,255,255,.4); display:none; transition:bottom .25s ease; }
+#backbtn:active { filter:brightness(1.4); }
+#backbtn.lift { bottom:140px; }
+#toast { position:absolute; left:50%; top:45%; transform:translate(-50%,-50%); z-index:70; display:none;
+  background:linear-gradient(#e8e8f5,#c8c8da); color:#222; border:1px solid #999; border-radius:8px; padding:16px 22px; font-size:14px; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,.6); }
+
+/* ═══════════ 密码锁屏（新增最外层，其余样式未动） ═══════════ */
+#lock { position:absolute; inset:34px 0 0 0; z-index:9999; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(circle at 30% 22%, rgba(160,120,255,.32), transparent 55%),
+              radial-gradient(circle at 72% 75%, rgba(255,110,190,.30), transparent 55%),
+              linear-gradient(160deg,#1c1c2e,#0c0c14);
+  transition:opacity .45s ease; }
+#lock.off { opacity:0; pointer-events:none; }
+#lock::before { content:""; position:absolute; inset:0; pointer-events:none; z-index:2;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); }
+#lock.shake .lock-card { animation:lockShake .45s; }
+@keyframes lockShake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-9px); } 40% { transform:translateX(8px); } 60% { transform:translateX(-6px); } 80% { transform:translateX(4px); } }
+.lock-card { position:relative; width:min(320px,86vw); text-align:center; padding:24px 22px 18px; border-radius:18px;
+  background:linear-gradient(160deg,#2c2c42,#181826);
+  border:1px solid rgba(255,255,255,.5);
+  box-shadow:0 10px 30px rgba(0,0,0,.65), inset 0 1px 2px rgba(255,255,255,.25); }
+.lock-time { font-size:42px; font-weight:bold; letter-spacing:2px; color:#f2f0ff; text-shadow:0 0 20px rgba(180,140,255,.9); }
+.lock-date { font-size:13px; margin-top:6px; color:#c9c4f5; }
+.lock-line { margin:16px auto 0; width:70%; border-top:1px dashed rgba(157,143,216,.5); }
+.lock-label { margin-top:12px; font-size:12px; letter-spacing:5px; color:#9d8fd8; }
+.lock-row { display:flex; gap:8px; margin-top:10px; align-items:stretch; }
+#lockpass { flex:1; min-width:0; padding:12px 10px; font-size:16px; letter-spacing:2px; text-align:center; color:#f2f0ff;
+  background:#14141f; border:1px solid rgba(255,255,255,.4); border-radius:10px; outline:none;
+  font-family:"MS PGothic","SimHei",sans-serif; caret-color:#ff6ec7; }
+#lockpass:focus { border-color:#ff6ec7; box-shadow:0 0 12px rgba(255,110,199,.45); }
+#lockeye { flex-shrink:0; width:54px; font-size:11px; letter-spacing:1px; color:#c9c4f5; cursor:pointer; user-select:none;
+  background:linear-gradient(#3a3a55,#22222f); border:1px solid rgba(255,255,255,.4); border-radius:10px;
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; }
+#lockeye:active { filter:brightness(1.3); }
+#lockbtn { margin-top:12px; padding:11px 0; font-size:15px; letter-spacing:6px; color:#fff; cursor:pointer; user-select:none;
+  background:linear-gradient(135deg,#8a4fff,#ff6ec7); border:1px solid rgba(255,255,255,.55); border-radius:22px;
+  box-shadow:0 3px 10px rgba(0,0,0,.55), inset 0 1px 2px rgba(255,255,255,.5); }
+#lockbtn:active { filter:brightness(1.25); transform:scale(.97); }
+#lockmsg { margin-top:10px; min-height:16px; font-size:12px; letter-spacing:1px; color:#ff9ecb; }
+.lock-foot { margin-top:6px; font-size:10px; letter-spacing:2px; color:#6f63a8; }
+</style>
+</head>
+<body>
+<div id="phone">
+  <div id="statusbar">
+    <span>▂▄▆ TAPE CLEAR</span>
+    <span id="clock">--:--</span>
+    <span>🔋 100%</span>
+  </div>
+
+  <div id="desktop">
+    <div class="grid">
+      <!-- 第1排：装饰 -->
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">🧮</div><div class="appname">计算器</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">⚙️</div><div class="appname">设置</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">🌐</div><div class="appname">浏览器</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">💬</div><div class="appname">聊天</div></div>
+
+      <!-- 第2排：4台磁带机 -->
+      <div class="app" onclick="openApp('tape-red.html','红白机')"><div class="icon c-red">📼</div><div class="appname">红白机</div></div>
+      <div class="app" onclick="openApp('tape-purple.html','极地紫')"><div class="icon c-purple">📼</div><div class="appname">极地紫</div></div>
+      <div class="app" onclick="openApp('pinkui.html','极地紫粉UI')"><div class="icon c-vp">📼</div><div class="appname">极地紫粉UI</div></div>
+      <div class="app" onclick="openApp('tape-y2k.html','Y2K粉紫')"><div class="icon c-y2k">📼</div><div class="appname">Y2K粉紫</div></div>
+
+      <!-- 第3排：三台相机 + 回到未来 -->
+      <div class="app" onclick="openApp('camera-player.html','VEROX-7')">
+        <div class="icon c-cam1">
+          <svg class="icon-cam-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="30" width="76" height="46" rx="7" fill="#22222e" stroke="#cfd2ff" stroke-width="2"/>
+            <rect x="36" y="22" width="24" height="10" rx="3" fill="#22222e" stroke="#cfd2ff" stroke-width="2"/>
+            <rect class="flash" x="66" y="24" width="14" height="7" rx="2" fill="#bfeaff"/>
+            <circle cx="44" cy="53" r="14" fill="#101018" stroke="#9fdcf5" stroke-width="2.5"/>
+            <circle cx="44" cy="53" r="6" fill="#3a5cff"/>
+            <rect x="62" y="48" width="16" height="5" rx="2" fill="#9fdcf5"/>
+          </svg>
+        </div>
+        <div class="appname">VEROX-7</div>
+      </div>
+
+      <div class="app" onclick="openApp('polaroid-player.html','拍立得')">
+        <div class="icon c-cam2">
+          <svg class="icon-cam-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="14" y="26" width="72" height="52" rx="6" fill="#e8e4dc" stroke="#4a4a44" stroke-width="2"/>
+            <rect x="14" y="62" width="72" height="16" fill="#9fb8ad"/>
+            <rect x="20" y="66" width="60" height="10" rx="2" fill="#f7f5ee"/>
+            <circle cx="50" cy="44" r="13" fill="#2b2b2b" stroke="#6a6a60" stroke-width="3"/>
+            <circle cx="50" cy="44" r="5" fill="#8fd0c0"/>
+            <circle class="flash" cx="74" cy="36" r="4" fill="#ff6ec7"/>
+          </svg>
+        </div>
+        <div class="appname">拍立得</div>
+      </div>
+
+      <div class="app" onclick="openApp('Nikon.html','尼康')">
+        <div class="icon c-cam3">
+          <svg class="icon-cam-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="20,36 32,36 38,24 62,24 68,36 88,36 88,82 20,82" fill="#1a1a22" stroke="#8a8aa0" stroke-width="2"/>
+            <circle cx="54" cy="56" r="16" fill="#0c0c12" stroke="#8a8aa0" stroke-width="2.5"/>
+            <circle cx="54" cy="56" r="7" fill="#3a5cff"/>
+            <circle class="flash" cx="28" cy="46" r="4" fill="#bfeaff"/>
+            <rect x="26" y="68" width="14" height="8" rx="2" fill="#8a8aa0"/>
+          </svg>
+        </div>
+        <div class="appname">尼康</div>
+      </div>
+
+      <div class="app" onclick="openApp('holo.html','回到未来')">
+        <div class="icon c-holo">
+          <svg class="icon-holo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="28" y="72" width="44" height="10" rx="3" fill="#0a1e33" stroke="#9fdcf5" stroke-width="1.5"/>
+            <rect x="34" y="64" width="32" height="8" rx="2" fill="#16304e" stroke="#9fdcf5" stroke-width="1.2"/>
+            <polygon points="38,62 62,62 76,20 24,20" fill="#9fdcf5" opacity=".22"/>
+            <polygon points="38,62 62,62 76,20 24,20" fill="none" stroke="#bfeaff" stroke-width="1" opacity=".5"/>
+            <rect class="holoscr" x="30" y="24" width="40" height="26" rx="3" fill="#bfeaff" opacity=".8"/>
+            <rect x="30" y="24" width="40" height="26" rx="3" fill="none" stroke="#d6f2ff" stroke-width="1.5"/>
+            <path d="M36 40 L42 34 L48 42 L54 30 L60 38 L64 36" fill="none" stroke="#1e5c8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="appname">回到未来</div>
+      </div>
+
+      <!-- 第4排：装饰 -->
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">✉️</div><div class="appname">信息</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">📞</div><div class="appname">电话</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">🎮</div><div class="appname">游戏</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">🎵</div><div class="appname">音乐</div></div>
+
+      <!-- 第5排：装饰 -->
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">📁</div><div class="appname">文件</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">📅</div><div class="appname">日历</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">🗑️</div><div class="appname">回收站</div></div>
+      <div class="app" onclick="fakeApp()"><div class="icon c-fake">⏰</div><div class="appname">时钟</div></div>
+    </div>
+  </div>
+
+  <!-- 待机时钟层 -->
+  <div id="standby" onclick="unlock()">
+    <div class="bigtime" id="bigtime">--:--</div>
+    <div class="date" id="date">--</div>
+    <div class="hint">点击任意位置解锁</div>
+  </div>
+
+  <div id="view"><iframe id="frame" src="about:blank"></iframe></div>
+  <div id="loading"><div class="spinner"></div><p id="loadtext">LOADING…</p></div>
+  <div id="backbtn" onclick="closeApp()">◀ 返回</div>
+  <div id="toast">此应用不可用<br>（Y2K 信号丢失）</div>
+
+  <!-- ═══════════ 密码锁屏（最外层新增） ═══════════ -->
+  <div id="lock">
+    <div class="lock-card">
+      <div class="lock-time" id="locktime">--:--</div>
+      <div class="lock-date" id="lockdate">--</div>
+      <div class="lock-line"></div>
+      <div class="lock-label">PASSWORD</div>
+      <div class="lock-row">
+        <input id="lockpass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="····">
+        <div id="lockeye" title="显示 / 隐藏密码">显示</div>
+      </div>
+      <div id="lockbtn">解 锁</div>
+      <div id="lockmsg"></div>
+      <div class="lock-foot">★ TAPE CLEAR SECURITY 2000 ★</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var loadingTimer, appMounted = false;
+function mountFrame(file) {
+  var old = document.getElementById('frame');
+  var f = document.createElement('iframe');
+  f.id = 'frame';
+  old.parentNode.replaceChild(f, old);
+  if (file === 'about:blank') { f.src = 'about:blank'; return; }
+  f.src = 'about:blank';
+  f.addEventListener('load', function onl() {
+    f.removeEventListener('load', onl);
+    try { f.contentWindow.location.replace(encodeURI(file)); }
+    catch(e) { f.src = encodeURI(file); }
+  });
+}
+function setBackLift(file) {
+  document.getElementById('backbtn').classList.toggle('lift', file === 'holo.html');
+}
+function openApp(fileName, name) {
+  clearTimeout(loadingTimer);
+  document.getElementById('loadtext').textContent = 'LOADING ' + name + '…';
+  document.getElementById('loading').style.display = 'flex';
+  setBackLift(fileName);
+  appMounted = true;
+  loadingTimer = setTimeout(function () {
+    mountFrame(fileName);
+    try {
+      if (history.state && history.state.app) history.replaceState({app: fileName}, '');
+      else history.pushState({app: fileName}, '');
+    } catch(e) {}
+    document.getElementById('view').style.display = 'block';
+    document.getElementById('backbtn').style.display = 'block';
+    document.getElementById('loading').style.display = 'none';
+  }, 1200);
+}
+function closeAppUI() {
+  clearTimeout(loadingTimer);
+  document.getElementById('view').style.display = 'none';
+  document.getElementById('backbtn').style.display = 'none';
+  setBackLift('');
+  document.getElementById('loading').style.display = 'none';
+  mountFrame('about:blank');
+  appMounted = false;
+}
+function closeApp() {
+  closeAppUI();
+  if (history.state && history.state.app) { try { history.back(); } catch(e) {} }
+}
+window.addEventListener('popstate', function (e) {
+  if (e.state && e.state.app) {
+    if (!appMounted) {
+      mountFrame(e.state.app);
+      setBackLift(e.state.app);
+      appMounted = true;
+      document.getElementById('view').style.display = 'block';
+      document.getElementById('backbtn').style.display = 'block';
+    }
+  } else if (appMounted) {
+    closeAppUI();
+  }
+});
+function fakeApp() {
+  var t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, 1500);
+}
+function unlock() { document.getElementById('standby').style.display = 'none'; }
+function tick() {
+  var d = new Date();
+  var h = ('0'+d.getHours()).slice(-2);
+  var m = ('0'+d.getMinutes()).slice(-2);
+  document.getElementById('clock').textContent = h + ':' + m;
+  document.getElementById('bigtime').textContent = h + ':' + m;
+  var wk = ['日','一','二','三','四','五','六'];
+  document.getElementById('date').textContent = (d.getMonth()+1) + '月' + d.getDate() + '日 星期' + wk[d.getDay()];
+}
+tick();
+setInterval(tick, 10000);
+</script>
+
+<script>
+/* ═══════════ 密码锁屏逻辑（新增，原有脚本未动） ═══════════
+   【怎么改密码】只改下面 LOCK_HASH 引号里的一串即可：
+   1. 打开你的网站，按 F12 打开控制台，切到 Console（控制台）标签
+   2. 输入：  lockFingerprint("你的新密码")   然后回车
+   3. 会打印出一串字符（比如 7R96Q0 这样），复制它，
+      替换下面 LOCK_HASH = ' ' 引号里的内容，保存重新上传即可
+   ※ 密码里的空格会被自动忽略：输不输空格、输几个空格都能解锁
+   ※ 源码里只有这串“指纹”，看不到密码原文。 */
+(function () {
+  var LOCK_HASH = '7R96Q0';
+  var lock  = document.getElementById('lock');
+  var input = document.getElementById('lockpass');
+  var msg   = document.getElementById('lockmsg');
+  var btn   = document.getElementById('lockbtn');
+  var tries = 0;
+
+  window.lockFingerprint = function (s) {
+    s = String(s).normalize('NFKC').replace(/\s+/g, '').toUpperCase();
+    s = 'Y2K-TAPE-2000::' + s;
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) { h = ((h << 5) + h) ^ s.charCodeAt(i); }
+    return (h >>> 0).toString(36).toUpperCase();
+  };
+
+  function tryUnlock() {
+    if (lockFingerprint(input.value) === LOCK_HASH) {
+      msg.textContent = '✓ WELCOME BACK TO 2000';
+      msg.style.color = '#b6f2c5';
+      lock.classList.add('off');
+      setTimeout(function () { lock.style.display = 'none'; }, 480);
+    } else {
+      tries++;
+      msg.style.color = '#ff9ecb';
+      msg.textContent = (tries >= 3) ? '✗ 还是不对…提示：和 Y2K 那年的回忆有关' : '✗ 密码不对，再想想';
+      lock.classList.remove('shake');
+      void lock.offsetWidth;
+      lock.classList.add('shake');
+      input.value = '';
+      input.focus();
+    }
+  }
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryUnlock(); });
+
+  /* 显示/隐藏密码按钮：常驻可用，不依赖浏览器自带的小眼睛 */
+  var eye = document.getElementById('lockeye');
+  eye.addEventListener('click', function () {
+    var toText = (input.type === 'password');
+    input.type = toText ? 'text' : 'password';
+    eye.textContent = toText ? '隐藏' : '显示';
+    try { input.focus(); } catch (e) {}
+  });
+
+  /* 锁屏上的时钟：独立小逻辑，不动原有 tick */
+  function lockTick() {
+    var d = new Date();
+    var h = ('0' + d.getHours()).slice(-2), m = ('0' + d.getMinutes()).slice(-2);
+    var lt = document.getElementById('locktime'), ld = document.getElementById('lockdate');
+    if (lt) lt.textContent = h + ':' + m;
+    if (ld) {
+      var wk = ['日','一','二','三','四','五','六'];
+      ld.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 星期' + wk[d.getDay()];
+    }
+  }
+  lockTick();
+  setInterval(lockTick, 10000);
+  setTimeout(function () { try { input.focus(); } catch (e) {} }, 300);
+})();
+</script>
+</body>
+</html>
