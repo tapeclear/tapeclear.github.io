@@ -33,5 +33,5 @@ window.PLAYLIST = [
   {file:'music/032.mp3', title:'恋なんて向いてないよ', artist:'', cover:'covers/032.jpg'},
   {file:'music/033.mp3', title:'日記 620_4 (3)', artist:'', cover:'covers/033.jpg'},
   {file:'music/034.mp3', title:'神様', artist:'', cover:'covers/034.jpg'},
-  {file:'music/035.wav', title:'音', artist:'', cover:'covers/035.jpg'},
+  {file:'music/035.mp3', title:'音', artist:'', cover:'covers/035.jpg'},
 ];
