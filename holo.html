@@ -256,7 +256,7 @@ box-shadow:0 0 12px #8fd8f5;opacity:0;transition:opacity .15s;z-index:2}
 <div id="toast"></div>
 <div id="zoom"><div class="big"></div></div>
 <audio id="au"></audio>
-<script src="https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js"></script>
+<script src="data.js?v=20261126a"></script>
 
 <!-- 实体操作台 -->
 <div id="console">
@@ -284,7 +284,7 @@ box-shadow:0 0 12px #8fd8f5;opacity:0;transition:opacity .15s;z-index:2}
 </div>
 
 <script>
-/* ★ 歌单：读取同文件夹的 https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js（PLAYLIST），字段映射 title→name ★ */
+/* ★ 歌单：读取同文件夹的 data.js（PLAYLIST），字段映射 title→name ★ */
 const TRACKS = (window.PLAYLIST || []).map(function(t){
   return {file: t.file, name: t.title || '未命名曲目', cover: t.cover || ''};
 });
@@ -296,7 +296,7 @@ let seqLock=false,seqTimer=0;
 /* ---- 启动（原样保留）---- */
 const msgs=['> INITIALIZING...','> CALIBRATING PROJECTOR...','> HOLO MATRIX: READY','> AWAITING INPUT_'];
 /* 诊断行：开机画面直接报告歌单读取状态与打开方式 */
-msgs.push('> DATA: '+(TRACKS.length?TRACKS.length+' TRACKS · '+(location.protocol==='file:'?'FILE 本地':'WEB 在线'):'MISSING · 未读到 https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js（须与页面同一文件夹）'));
+msgs.push('> DATA: '+(TRACKS.length?TRACKS.length+' TRACKS · '+(location.protocol==='file:'?'FILE 本地':'WEB 在线'):'MISSING · 未读到 data.js（须与页面同一文件夹）'));
 const bl=document.getElementById('blines'),bb=document.getElementById('bbar');
 let bi=0;
 const bt=setInterval(()=>{
@@ -385,7 +385,7 @@ function load(){
   }
 }
 function play(fromList){
-  if(!TRACKS.length){toast('NO DATA：未读到同文件夹的 https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js');return;}
+  if(!TRACKS.length){toast('NO DATA：未读到同文件夹的 data.js');return;}
   if(fromList||!au.src)load();
   au.play().then(()=>{
     document.getElementById('bplay').textContent='⏸';

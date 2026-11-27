@@ -69,6 +69,7 @@ header .sub{margin-top:7px;font-size:13px;color:#8d8b85}
 .cs-spec{position:absolute;top:10px;left:14px;width:52px;height:32px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.25)}
 .cs-bottom{padding:5px 9px 7px;border-top:1px solid rgba(255,255,255,.08)}
 .cs-track{height:3px;background:rgba(255,255,255,.18);border-radius:2px;position:relative}
+.cs-seek{padding:12px 0 10px;cursor:pointer;touch-action:none}
 .cs-fill{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:2px;width:0%}
 .cs-knob{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 6px rgba(255,255,255,.7);left:0%}
 .cs-time{display:flex;justify-content:space-between;font-size:9px;color:#a8a8a8;margin-top:6px;letter-spacing:.5px}
@@ -130,14 +131,14 @@ header .sub{font-size:11px}
 }
 </style>
 </head>
-<script src="https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js"></script>
+<script src="data.js?v=20261126a"></script>
 <body>
 <script>
 /* ══════════════════════════════════════════════════
    ★ 歌曲配置区 ★
    歌曲和封面放在本网页同一个文件夹的 music / covers 里
    ══════════════════════════════════════════════════ */
-/* 歌单统一从 https://sfile.chatglm.cn/workspace/file/ef/efba4ba46c.js 读取（和随身听共用一份） */
+/* 歌单统一从 data.js 读取（和随身听共用一份） */
 const SONGS = (window.PLAYLIST || []).map(function(s){
   return {
     title: s.title,
@@ -178,7 +179,7 @@ const SONGS = (window.PLAYLIST || []).map(function(s){
         <canvas class="cs-spec" id="csSpec"></canvas>
       </div>
       <div class="cs-bottom">
-        <div class="cs-track"><div class="cs-fill" id="csFill"></div><div class="cs-knob" id="csKnob"></div></div>
+        <div class="cs-seek" id="csSeek"><div class="cs-track"><div class="cs-fill" id="csFill"></div><div class="cs-knob" id="csKnob"></div></div></div>
         <div class="cs-time"><span id="csCur">00:00</span><span id="csRem">REM --:--</span></div>
       </div>
     </div>
@@ -278,6 +279,22 @@ audio.addEventListener("loadedmetadata", ()=>{ renderAll(); });
 audio.addEventListener("durationchange", ()=>{ renderTime(); });
 audio.addEventListener("timeupdate", ()=>{ renderTime(); });
 audio.addEventListener("error", ()=>{ if(audio.src) $("csStateTxt").textContent = "加载失败"; });
+/* ---------- 进度条拖动（带防护：总时长未读出前不响应） ---------- */
+(function(){
+  const box = $("csSeek");
+  let dragging = false;
+  function seekTo(x){
+    if(!isFinite(audio.duration) || audio.duration <= 0) return;
+    const r = box.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    audio.currentTime = audio.duration * p;
+    renderTime();
+  }
+  box.addEventListener("pointerdown", e => { dragging = true; try{ box.setPointerCapture(e.pointerId); }catch(_){ } seekTo(e.clientX); e.preventDefault(); });
+  box.addEventListener("pointermove", e => { if(dragging) seekTo(e.clientX); });
+  box.addEventListener("pointerup", () => { dragging = false; });
+  box.addEventListener("pointercancel", () => { dragging = false; });
+})();
 /* ---------- 预加载下一首：当前歌缓冲稳了之后，后台提前下载下一首音频+封面 ---------- */
 const preCache = {};
 const preAudio = new Audio(); preAudio.preload = "auto";
