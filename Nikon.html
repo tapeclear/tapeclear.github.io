@@ -3,55 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>相机播放器 · NAXON D-70</title>
+<title>相机播放器 · VEROX-7</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0e0f12;background-image:radial-gradient(1000px 620px at 50% -10%,#1a1c22,transparent);color:#e8e6e0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:26px 16px 56px}
-header{text-align:center;margin-bottom:20px}
+body{background:#0e0f12;background-image:radial-gradient(1000px 620px at 50% -10%,#1a1c22,transparent);color:#e8e6e0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 16px 56px}
+header{text-align:center;margin-bottom:24px}
 header h1{font-size:19px;font-weight:700;letter-spacing:1px;color:#f2efe8}
 header .sub{margin-top:7px;font-size:13px;color:#8d8b85}
-.cam{width:464px;max-width:100%;position:relative}
-/* ---- 五棱镜顶盖（银灰）---- */
-.prism{position:relative;height:40px;background:linear-gradient(180deg,#d6d6d1,#ababa5);border-radius:8px 8px 0 0;border:1px solid #6f6f69;border-bottom:none;display:flex;align-items:center;justify-content:center;z-index:3}
-.prism .hump{width:190px;height:100%;background:linear-gradient(180deg,#dcdcd7,#b3b3ac);clip-path:polygon(16% 0,84% 0,100% 100%,0 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;gap:8px}
-.prism .brand{font-family:Georgia,serif;font-weight:700;font-size:14px;letter-spacing:3px;color:#4c4c46}
-.prism .model{font-size:9px;letter-spacing:2px;color:#7c7c74;font-family:ui-monospace,monospace}
-/* 弹出式闪光灯：开机时弹起 */
-.popup-flash{position:absolute;top:0;left:calc(50% - 46px);width:92px;height:26px;background:linear-gradient(180deg,#26262a,#101012);border:1px solid #000;border-radius:5px 5px 0 0;z-index:1;opacity:0;transform:translateY(20px);transition:transform .45s cubic-bezier(.3,1.35,.5,1),opacity .3s}
-.popup-flash::after{content:"";position:absolute;inset:5px 6px;border-radius:3px;background:radial-gradient(circle at 50% 40%,#f2f5f8,#c3ccd6 70%)}
-.popup-flash.up{opacity:1;transform:translateY(-16px)}
-/* ---- 顶面（模式转盘 / 肩屏 / 快门）---- */
-.top-deck{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(180deg,#cfcfca,#b0b0aa);border:1px solid #6f6f69;border-bottom:1px solid #55554f;position:relative;z-index:2}
-.mode-dial{width:48px;height:48px;border-radius:50%;flex:none;background:radial-gradient(circle at 38% 32%,#eaeae5,#b6b6b0 70%);border:2px solid #82827c;box-shadow:0 2px 5px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.6);cursor:pointer;position:relative;transition:transform .3s ease}
-.mode-dial::after{content:"";position:absolute;left:50%;top:5px;width:3px;height:14px;margin-left:-1.5px;border-radius:2px;background:#5a5a54}
-.mode-dial::before{content:"P/S/A/M";position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:1px;color:#6e6e66;font-family:ui-monospace,monospace;white-space:nowrap}
-.shoulder{flex:1;min-width:0;background:#0b0b0b;border:1px solid #000;border-radius:5px;padding:9px 12px;font-family:ui-monospace,"Courier New",monospace;font-size:11px;letter-spacing:1px;color:#ffb14d;text-shadow:0 0 7px rgba(255,177,77,.5);display:flex;justify-content:space-between;gap:8px;box-shadow:inset 0 0 16px rgba(0,0,0,.9),inset 0 0 0 1px rgba(255,177,77,.08);white-space:nowrap;overflow:hidden;position:relative}
+.cam{width:430px;max-width:100%;background:#151515;border:1px solid #000;border-radius:10px;box-shadow:0 30px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);position:relative;padding-bottom:6px}
+.cam-top{display:flex;align-items:center;gap:13px;padding:16px 16px 12px;background:linear-gradient(180deg,#242424,#171717);border-radius:10px 10px 0 0;border-bottom:1px solid #000}
+.cam-pwr{width:26px;height:34px;border-radius:4px;background:linear-gradient(180deg,#3a3a3a,#1c1c1c);border:1px solid #000;cursor:pointer;font-size:8px;color:#999;font-family:ui-monospace,monospace;letter-spacing:1px;flex:none;padding:0}
+.cam-pwr:active{background:#111}
+.cam-shutter{width:50px;height:50px;border-radius:50%;flex:none;cursor:pointer;border:1px solid #000;position:relative;padding:0;background:radial-gradient(circle at 36% 30%,#5c5c5c,#232323 65%,#101010);box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 2px 3px rgba(255,255,255,.25),inset 0 -3px 6px #000}
+.cam-shutter::after{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#7b7b7b,#2e2e2e);box-shadow:inset 0 1px 2px rgba(255,255,255,.3),inset 0 -2px 4px #000}
+.cam-shutter:active{transform:translateY(1px)}
+.cam-red{width:11px;height:11px;border-radius:50%;background:#d0342c;box-shadow:0 0 9px rgba(208,52,44,.55);flex:none}
+.shoulder{flex:1;min-width:0;position:relative;background:#0b0b0b;border:1px solid #000;border-radius:5px;padding:9px 12px;font-family:ui-monospace,"Courier New",monospace;font-size:11px;letter-spacing:1px;color:#ffb14d;text-shadow:0 0 7px rgba(255,177,77,.5);display:flex;justify-content:space-between;gap:8px;box-shadow:inset 0 0 16px rgba(0,0,0,.9),inset 0 0 0 1px rgba(255,177,77,.08);white-space:nowrap;overflow:hidden}
 .shoulder span{overflow:hidden;text-overflow:ellipsis}
 .sh-boot{position:absolute;inset:0;background:#0b0b0b;display:flex;align-items:center;justify-content:center;letter-spacing:4px;opacity:0;transition:opacity .3s;pointer-events:none}
 .sh-boot.on{opacity:1}
-.shutter-unit{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none}
-.shutter{width:50px;height:50px;border-radius:50%;cursor:pointer;border:1px solid #000;position:relative;background:radial-gradient(circle at 36% 30%,#8c8c88,#3c3c3a 62%,#1c1c1a);box-shadow:0 4px 10px rgba(0,0,0,.5),inset 0 2px 3px rgba(255,255,255,.4),inset 0 -3px 6px #000}
-.shutter::after{content:"";position:absolute;inset:13px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#a8a8a2,#4e4e4a);box-shadow:inset 0 1px 2px rgba(255,255,255,.4),inset 0 -2px 4px #000}
-.shutter:active{transform:translateY(1px)}
-.pwr{width:40px;height:16px;border-radius:8px;background:linear-gradient(180deg,#3c3c3a,#1c1c1a);border:1px solid #000;color:#c9c9c4;font-size:8px;font-family:ui-monospace,monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2)}
-.pwr:active{transform:translateY(1px)}
-/* ---- 机身背面（黑）---- */
-.cam-body{display:flex;gap:0;background:linear-gradient(180deg,#26262a,#161618);border:1px solid #000;border-top:none;padding:14px 14px 16px;position:relative;min-height:280px}
-.cam-body::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,#1d1d1f 0 3px,#101012 3px 6px)}
-.cam-screen{flex:1;min-width:0;aspect-ratio:4/3;background:#000;border:2px solid #000;border-radius:4px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px #262626,inset 0 0 34px rgba(0,0,0,.9);color:#e6e6e6;font-family:ui-monospace,"Courier New",monospace;display:flex;flex-direction:column}
-.boot{position:absolute;inset:0;background:#000;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;transition:opacity .45s}
-.boot.off{opacity:0;pointer-events:none}
-.boot .word{font-family:Georgia,serif;font-size:23px;font-weight:700;color:#f2f2f2;letter-spacing:.5em;transition:letter-spacing 1s ease,opacity .8s;opacity:0;padding-left:.5em}
-.boot.on .word{letter-spacing:.18em;opacity:1;padding-left:.18em}
-.boot .s{font-size:9px;color:#8a8a8a;letter-spacing:3px;opacity:0;transition:opacity .6s .5s}
-.boot.on .s{opacity:1}
-.cs-top{display:flex;align-items:center;gap:8px;padding:4px 9px;font-size:9px;letter-spacing:.5px;color:#c9c9c9;border-bottom:1px solid rgba(255,255,255,.08)}
+.cam-main{display:flex;gap:13px;padding:14px 16px 12px}
+.cam-screen{flex:1;min-width:0;aspect-ratio:4/3;background:#000;border:2px solid #000;border-radius:5px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px #262626,inset 0 0 34px rgba(0,0,0,.9);color:#e6e6e6;font-family:ui-monospace,"Courier New",monospace;display:flex;flex-direction:column}
+.cs-top{display:flex;align-items:center;gap:8px;padding:6px 9px;font-size:9px;letter-spacing:.5px;color:#c9c9c9;border-bottom:1px solid rgba(255,255,255,.08)}
 .cs-state{display:flex;align-items:center;gap:5px;flex:none;color:#fff;font-weight:700}
 .cs-icon{flex:none}
 .cs-icon.play{border-left:7px solid #fff;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;width:0;height:0}
 .cs-icon.pause{width:7px;height:9px;background:linear-gradient(90deg,#fff 0 2.5px,transparent 2.5px 4.5px,#fff 4.5px 7px)}
 .cs-file{margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cs-photo{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:4px 10px;min-height:0}
+.cs-photo{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:6px 12px;min-height:0}
 .cs-art{flex:none;display:flex;align-items:center;justify-content:center;height:100%;max-width:100%;aspect-ratio:1}
 .cs-art img,.cs-art svg{width:100%;height:100%;object-fit:cover;display:block;box-shadow:0 6px 18px rgba(0,0,0,.8)}
 /* 照片双指缩放 */
@@ -67,71 +46,67 @@ header .sub{margin-top:7px;font-size:13px;color:#8d8b85}
 .cs-param{position:absolute;top:10px;right:14px;text-align:right;font-size:9px;line-height:1.7;color:#f2f2f2;text-shadow:0 1px 3px #000,0 0 2px #000}
 .cs-param .hl{color:#ffd257}
 .cs-spec{position:absolute;top:10px;left:14px;width:52px;height:32px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.25)}
-.cs-bottom{padding:5px 9px 7px;border-top:1px solid rgba(255,255,255,.08)}
-.cs-track{height:3px;background:rgba(255,255,255,.18);border-radius:2px;position:relative}
+.cam-screen.disp-min .cs-spec,.cam-screen.disp-min .af{display:none}
+.cam-screen.disp-none .cs-spec,.cam-screen.disp-none .af,.cam-screen.disp-none .cs-param{display:none}
+.cs-bottom{padding:7px 9px 9px;border-top:1px solid rgba(255,255,255,.08)}
+.cs-track{height:3px;background:rgba(255,255,255,.18);border-radius:2px;position:relative;cursor:pointer;touch-action:none}
+/* 拖动热区：隐形外扩，不占布局空间，照片保持原尺寸 */
+.cs-track::after{content:"";position:absolute;left:-8px;right:-8px;top:-12px;bottom:-12px}
 .cs-fill{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:2px;width:0%}
 .cs-knob{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 6px rgba(255,255,255,.7);left:0%}
 .cs-time{display:flex;justify-content:space-between;font-size:9px;color:#a8a8a8;margin-top:6px;letter-spacing:.5px}
-.cam-screen.disp-min .cs-spec,.cam-screen.disp-min .af{display:none}
-.cam-screen.disp-none .cs-spec,.cam-screen.disp-none .af,.cam-screen.disp-none .cs-param{display:none}
-/* ---- 右侧按键面板（D70 布局）---- */
-.keypad{width:122px;flex:none;display:flex;flex-direction:column;align-items:center;gap:9px;padding:6px 0 0 12px}
-.k-row{display:flex;gap:6px}
-.mini-key{width:44px;height:17px;border-radius:3px;background:linear-gradient(180deg,#333338,#1e1e22);border:1px solid #000;color:#a9a9a4;font-size:7px;font-family:ui-monospace,monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12)}
-.mini-key:active{transform:translateY(1px);background:#131316}
-.dpad{position:relative;width:96px;height:96px;margin-top:2px}
-.dv{position:absolute;width:32px;height:32px;background:linear-gradient(180deg,#34343a,#1e1e22);border:1px solid #000;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
-.dv:active{background:#131316}
-.dv i{display:block;width:0;height:0;border:5px solid transparent}
-.dv.up{top:0;left:32px;border-radius:7px 7px 0 0}
-.dv.up i{border-bottom:7px solid #d2d2cc}
-.dv.down{bottom:0;left:32px;border-radius:0 0 7px 7px}
-.dv.down i{border-top:7px solid #d2d2cc}
-.dv.left{left:0;top:32px;border-radius:7px 0 0 7px}
-.dv.left i{border-right:7px solid #d2d2cc}
-.dv.right{right:0;top:32px;border-radius:0 7px 7px 0}
-.dv.right i{border-left:7px solid #d2d2cc}
-.dv.ok{left:32px;top:32px;width:32px;height:32px;border-radius:0;background:#26262c;font-size:9px;color:#e8e8e2;letter-spacing:1px;font-family:ui-monospace,monospace}
-.k-cap{font-size:7px;color:#77776f;letter-spacing:1px;text-align:center;line-height:1.7;font-family:ui-monospace,monospace}
-.del-key{width:66px;height:17px;font-size:7px}
-/* ---- 握把蒙皮（D70 有橡胶饰皮）---- */
-.grip{position:absolute;right:-9px;top:66px;bottom:16px;width:17px;border-radius:0 9px 9px 0;background:repeating-linear-gradient(115deg,#2e2e32 0 3px,#19191c 3px 6px);border:1px solid #000;border-left:none}
-.hint{margin-top:20px;font-size:12px;color:#8d8b85;max-width:480px;text-align:center;line-height:1.9}
+.cam-keys{display:flex;flex-direction:column;gap:9px;justify-content:center;flex:none;padding-right:4px}
+.cam-key{width:54px;height:29px;border-radius:15px;background:linear-gradient(180deg,#2e2e2e,#1a1a1a);border:1px solid #000;color:#c2c2c2;font-family:ui-monospace,monospace;font-size:9px;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.14);padding:0}
+.cam-key:active{transform:translateY(1px);background:#121212}
+.cam-foot{display:flex;align-items:center;gap:10px;padding:2px 18px 10px}
+.cam-logo{font-family:Georgia,serif;font-weight:700;font-size:16px;letter-spacing:2px;color:#ececec}
+.cam-logo sup{font-size:9px;color:#9c9c9c}
+.cam-foot .rd{width:12px;height:12px;border-radius:50%;background:#d0342c;box-shadow:0 0 8px rgba(208,52,44,.5)}
+.cam-foot .tag{margin-left:auto;font-size:9px;color:#7c7c7c;letter-spacing:1.5px;font-family:ui-monospace,monospace}
+.boot{position:absolute;inset:0;background:#000;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;transition:opacity .45s}
+.boot.off{opacity:0;pointer-events:none}
+.boot .word{font-family:Georgia,serif;font-size:24px;font-weight:700;color:#f2f2f2;letter-spacing:.5em;transition:letter-spacing 1s ease,opacity .8s;opacity:0;padding-left:.5em}
+.boot.on .word{letter-spacing:.18em;opacity:1;padding-left:.18em}
+.boot .dot{width:14px;height:14px;border-radius:50%;background:#d0342c;box-shadow:0 0 14px rgba(208,52,44,.8);opacity:0;transition:opacity .6s .35s}
+.boot.on .dot{opacity:1}
+.boot .s{font-size:9px;color:#8a8a8a;letter-spacing:3px;opacity:0;transition:opacity .6s .6s}
+.boot.on .s{opacity:1}
+.grip{position:absolute;right:0;top:76px;bottom:36px;width:10px;border-radius:0 6px 6px 0;background:repeating-linear-gradient(115deg,#262626 0 3px,#151515 3px 6px);border:1px solid #000;border-right:none}
+.hint{margin-top:20px;font-size:12px;color:#8d8b85;max-width:460px;text-align:center;line-height:1.9}
 .hint b{color:#c9c6be}
-/* ---- 手机满宽适配：像把相机握在手里 ---- */
+/* ===== 手机窄屏自适应（桌面样式完全不变） ===== */
 @media (max-width:480px){
-body{padding:14px 8px 44px}
-header h1{font-size:15px}
+body{padding:20px 8px 44px}
+header h1{font-size:16px}
 header .sub{font-size:11px}
 .cam{width:100%}
-.prism{height:34px}
-.prism .hump{width:60%;height:100%}
-.prism .brand{font-size:12px}
-.top-deck{padding:10px 8px;gap:8px}
-.mode-dial{width:40px;height:40px}
-.shoulder{font-size:9px;padding:7px 8px;letter-spacing:0}
-.shutter{width:44px;height:44px}
-.shutter::after{inset:12px}
-.cam-body{padding:10px 8px 12px}
-.cs-top{font-size:8px;padding:5px 7px}
-.cs-param{font-size:8px;right:10px}
-.cs-spec{width:46px;height:28px;top:8px;left:10px}
+.cam-top{padding:12px 10px 10px;gap:8px}
+.cam-pwr{width:22px;height:30px;font-size:7px}
+.cam-shutter{width:44px;height:44px}
+.cam-shutter::after{inset:11px}
+.cam-red{width:9px;height:9px}
+.shoulder{font-size:9px;padding:8px 9px;gap:6px;letter-spacing:0}
+.sh-boot{letter-spacing:2px;font-size:10px}
+.cam-main{padding:10px 10px 12px;gap:8px}
+.cam-keys{gap:7px;padding-right:4px}
+.cam-key{width:46px;height:26px;font-size:8px}
+.cs-top{font-size:8px;padding:5px 7px;gap:6px}
+.cs-photo{padding:6px 8px}
+.cs-param{font-size:8px;right:10px;top:8px}
+.cs-spec{width:44px;height:26px;top:8px;left:10px}
+.cs-bottom{padding:6px 7px 8px}
 .cs-time{font-size:8px}
-.keypad{width:88px;padding-left:8px;gap:7px}
-.mini-key{width:34px;height:15px;font-size:6px}
-.dpad{width:80px;height:80px}
-.dv{width:26px;height:26px}
-.dv.up,.dv.down{left:27px}
-.dv.left,.dv.right{top:27px}
-.dv.ok{left:27px;top:27px;width:26px;height:26px;font-size:8px}
-.del-key{width:58px;height:15px}
-.grip{right:-5px;top:56px;bottom:12px;width:13px}
+.cam-foot{padding:2px 12px 8px;gap:8px}
+.cam-logo{font-size:14px}
+.cam-foot .tag{font-size:7px;letter-spacing:1px}
+.grip{top:60px;bottom:26px;width:8px}
+.boot .word{font-size:19px}
 .hint{font-size:11px}
 }
 </style>
 </head>
-<script src="data.js?v=20261126a"></script>
 <body>
+<script src="data.js?v=20261127a"></script>
 <script>
 /* ══════════════════════════════════════════════════
    ★ 歌曲配置区 ★
@@ -148,104 +123,112 @@ const SONGS = (window.PLAYLIST || []).map(function(s){
 });
 </script>
 <header>
-  <h1>相机播放器 · NAXON D-70</h1>
-  <p class="sub">千禧年日系单复刻：快门 = 播放 / 暂停 · 长按 ▼ 键切换声道宽度</p>
+  <h1>相机播放器 · VEROX-7</h1>
+  <p class="sub">肩屏 + 背屏回放 UI · 快门键 = 播放 / 暂停 · 长按 LOOP 键切换声道宽度</p>
 </header>
 <div class="cam">
-  <div class="popup-flash" id="flashPop" title="弹出式闪光灯"></div>
-  <div class="prism">
-    <div class="hump"><span class="brand">NAXON</span><span class="model">D-70</span></div>
-  </div>
-  <div class="top-deck">
-    <div class="mode-dial" id="modeDial" title="模式转盘（转着玩）"></div>
-    <div class="shoulder" id="shoulder">
-      <span id="csTrackNo">TRK --/--</span><span id="camMode">A</span><span id="shState">PAUSE</span><span id="shRem">--:--</span>
-      <span class="sh-boot" id="shBoot">NAXON D-70</span>
+  <div class="cam-top">
+    <button class="cam-pwr" id="camPwr" title="电源 / 重播开机动画">PWR</button>
+    <div class="shoulder">
+      <span id="csTrackNo">TRK 01/35</span>
+      <span id="camMode">A</span>
+      <span id="shState">PAUSE</span>
+      <span id="shRem">REM --:--</span>
+      <span class="sh-boot" id="shBoot">VEROX-7</span>
     </div>
-    <div class="shutter-unit">
-      <button class="shutter" id="shutter" title="快门 = 播放 / 暂停" aria-label="快门"></button>
-      <button class="pwr" id="camPwr" title="电源拨杆 / 重播开机动画">ON&#183;OFF</button>
-    </div>
+    <button class="cam-shutter" id="shutter" title="快门 = 播放 / 暂停" aria-label="快门"></button>
+    <span class="cam-red"></span>
   </div>
-  <div class="cam-body">
+  <div class="cam-main">
     <div class="cam-screen" id="camScreen">
-      <div class="boot" id="camBoot"><span class="word">NAXON</span><span class="s">D-70 · DIGITAL MUSIC</span></div>
-      <div class="cs-top"><span class="cs-state"><span class="cs-icon pause" id="csIcon"></span><span id="csStateTxt">PAUSE</span></span><span class="cs-file" id="csFile">NO FILE</span></div>
+      <div class="boot" id="camBoot">
+        <span class="dot"></span>
+        <span class="word">VEROX</span>
+        <span class="s">BACKSTAGE SERIES · STARTING</span>
+      </div>
+      <div class="cs-top">
+        <span class="cs-state"><span class="cs-icon pause" id="csIcon"></span><span id="csStateTxt">PAUSE</span></span>
+        <span class="cs-file" id="csFile">--</span>
+      </div>
       <div class="cs-photo">
         <div class="cs-art" id="csArt"></div>
         <div class="af"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
-        <div class="cs-param">f/2.8 &#183; 1/250<br>ISO 400 &#183; EV &#177;0<br><span class="hl" id="csModeLn">LOOP-A</span></div>
+        <div class="cs-param">f/2.8 · 1/250<br>ISO 400 · EV ±0<br><span class="hl" id="csBpm">LOOP-A</span></div>
         <canvas class="cs-spec" id="csSpec"></canvas>
       </div>
       <div class="cs-bottom">
-        <div class="cs-track"><div class="cs-fill" id="csFill"></div><div class="cs-knob" id="csKnob"></div></div>
-        <div class="cs-time"><span id="csCur">00:00</span><span id="csRem">REM --:--</span></div>
+        <div class="cs-track" id="csSeek"><div class="cs-fill" id="csFill"></div><div class="cs-knob" id="csKnob"></div></div>
+        <div class="cs-time"><span id="csCur">00:00</span><span id="csRem2">REM --:--</span></div>
       </div>
     </div>
-    <div class="keypad">
-      <div class="k-row"><button class="mini-key" title="装饰键">QUAL</button><button class="mini-key" title="装饰键">WB</button></div>
-      <div class="dpad">
-        <button class="dv up" id="dDisp" title="DISP：切换信息显示"><i></i></button>
-        <button class="dv left" id="dPrev" title="上一首"><i></i></button>
-        <button class="dv ok" id="dOk" title="OK = 播放 / 暂停">OK</button>
-        <button class="dv right" id="dNext" title="下一首"><i></i></button>
-        <button class="dv down" id="dLoop" title="点按 = 循环模式 · 长按 = 声道宽度"><i></i></button>
-      </div>
-      <div class="k-cap">&#9664; PREV &#183; NEXT &#9654;<br>&#9650; DISP &#183; LOOP &#9660;</div>
-      <button class="mini-key del-key" title="装饰键">DEL</button>
+    <div class="cam-keys">
+      <button class="cam-key" id="csDisp">DISP</button>
+      <button class="cam-key" id="csPrev">PREV</button>
+      <button class="cam-key" id="csNext">NEXT</button>
+      <button class="cam-key" id="csMode" title="点按 = 循环模式 · 长按 = 声道宽度">LOOP</button>
     </div>
-    <div class="grip"></div>
   </div>
+  <div class="cam-foot">
+    <span class="cam-logo">VEROX<sup>-7</sup></span>
+    <span class="rd"></span>
+    <span class="tag">Z-LENS 28/2 ASPH · MADE IN WEB</span>
+  </div>
+  <div class="grip"></div>
 </div>
-<p class="hint"><b>操作</b>：快门或 OK = 播放 / 暂停；D-pad 左右 = 切歌，上 = DISP 切信息，下 = 点按切循环模式、<b>长按一秒切声道宽度（NORMAL → WIDE → SUPER）</b>；ON 拨杆重播开机动画（闪光灯会弹出）。手机上机身撑满屏宽，像真机握在手里。</p>
+<p class="hint"><b>操作</b>：快门 = 播放 / 暂停；PREV / NEXT = 切歌；DISP = 切信息显示；LOOP = 点按切循环模式、<b>长按一秒切声道宽度（NORMAL → WIDE → SUPER）</b>。手机上机身会自动撑满屏宽。</p>
 <script>
+/* ================== 工具 ================== */
 const $ = id => document.getElementById(id);
 const audio = new Audio();
 audio.preload = "metadata";
 let idx = 0, mode = 0, disp = 0, raf = null, actx = null, analyser = null, fdata = null;
 const MODES = [["LOOP-A","A"],["LOOP-1","1"],["RND","RND"]];
-const audioEl = audio;
-
-/* ---------- 封面 ---------- */
+const specC = $("csSpec"), sg = specC.getContext("2d");
+/* ---------- 占位封面（未填 cover 时显示歌名） ---------- */
 const PH = [["#2e6e4e","#e9e4d5"],["#4a2a6a","#f2e8ff"],["#e07840","#f6ead8"],["#101828","#9fd8ff"],["#8a3a3a","#f6dede"],["#3a5a8a","#dce8f6"]];
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function phSVG(s,i){
-  const c = PH[i % PH.length];
-  return `<svg viewBox="0 0 150 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="${c[0]}"/><circle cx="75" cy="56" r="26" fill="none" stroke="${c[1]}" stroke-width="5" opacity=".9"/><circle cx="75" cy="56" r="11" fill="${c[1]}" opacity=".9"/><text x="75" y="122" text-anchor="middle" font-size="17" fill="${c[1]}" font-family="sans-serif">${esc(s.title).slice(0,9)}</text></svg>`;
+function phSVG(i){
+  const s = SONGS[i], c = PH[i % PH.length];
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="'+c[0]+'"/><circle cx="50" cy="42" r="16" fill="none" stroke="'+c[1]+'" stroke-width="3" opacity=".9"/><circle cx="50" cy="42" r="7" fill="'+c[1]+'" opacity=".9"/><text x="50" y="82" text-anchor="middle" font-size="8" fill="'+c[1]+'" font-family="sans-serif">'+esc(s.title).slice(0,9)+'</text></svg>';
 }
 function setCover(){
   const s = SONGS[idx], box = $("csArt");
   if(s.cover){
-    box.innerHTML = `<img alt="封面" src="${esc(s.cover)}">`;
+    box.innerHTML = '<img alt="封面" src="'+esc(s.cover)+'">';
     const im = box.querySelector("img");
-    im.onerror = ()=>{ box.innerHTML = phSVG(s, idx); };
-  } else {
-    box.innerHTML = phSVG(s, idx);
+    im.onerror = ()=>{ box.innerHTML = phSVG(idx); };
+  }else{
+    box.innerHTML = phSVG(idx);
   }
 }
-
+function camSwap(){
+  const a = $("csArt");
+  a.style.opacity = 0;
+  setTimeout(()=>{ setCover(); a.style.opacity = 1; }, 250);
+}
 /* ---------- 渲染 ---------- */
 function fmt(t){ if(!isFinite(t)) t = 0; t = Math.max(0, Math.round(t)); return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0"); }
 function renderTime(){
-  const raw = audio.duration, d = (isFinite(raw) && raw > 0) ? raw : 0, c = audio.currentTime || 0;
+  const s = SONGS[idx];
+  const raw = audio.duration, d = (isFinite(raw) && raw > 0) ? raw : (s.dur || 0), c = audio.currentTime || 0;
   const pct = d ? Math.min(100, c/d*100) : 0;
   $("csFill").style.width = pct + "%";
   $("csKnob").style.left = pct + "%";
   $("csCur").textContent = fmt(c);
-  $("csRem").textContent = d ? "REM " + fmt(Math.max(0, d - c)) : "REM --:--";
+  $("csRem2").textContent = "REM " + (d ? fmt(d-c) : "--:--");
+  $("shRem").textContent = "REM " + (d ? fmt(d-c) : "--:--");
 }
 function renderAll(){
   const s = SONGS[idx];
-  $("csFile").textContent = (s.src ? s.src.split("/").pop() : "NO FILE").toUpperCase();
-  $("csStateTxt").textContent = audio.paused ? "PAUSE" : "PLAY";
-  $("csIcon").className = "cs-icon " + (audio.paused ? "pause" : "play");
-  $("csModeLn").textContent = MODES[mode][0];
   $("csTrackNo").textContent = "TRK " + String(idx+1).padStart(2,"0") + "/" + String(SONGS.length).padStart(2,"0");
   $("camMode").textContent = MODES[mode][1];
   $("shState").textContent = audio.paused ? "PAUSE" : "PLAY";
+  $("csBpm").textContent = MODES[mode][0];
+  $("csStateTxt").textContent = audio.paused ? "PAUSE" : "PLAY";
+  $("csIcon").className = "cs-icon " + (audio.paused ? "pause" : "play");
+  $("csFile").textContent = s.src ? s.src.split("/").pop().toUpperCase() : "NO FILE";
   renderTime();
 }
-
 /* ---------- 播放控制 ---------- */
 function play(){
   if(!audio.src){ $("csStateTxt").textContent = "先添加歌曲"; return; }
@@ -268,16 +251,32 @@ function step(dir, force){
 function loadTrack(i, auto){
   idx = ((i % SONGS.length) + SONGS.length) % SONGS.length;
   if(SONGS[idx].src) audio.src = SONGS[idx].src;
-  setCover(); renderAll();
+  setCover(); camSwap(); renderAll();
   if(auto && SONGS[idx].src) play();
 }
 audio.addEventListener("ended", ()=>{ if(mode === 1){ audio.currentTime = 0; play(); } else step(mode === 2 ? 0 : 1, true); });
 audio.addEventListener("play", ()=>{ startSpec(); renderAll(); });
 audio.addEventListener("pause", ()=>{ stopSpec(); renderAll(); });
-audio.addEventListener("loadedmetadata", ()=>{ renderAll(); });
-audio.addEventListener("durationchange", ()=>{ renderTime(); });
-audio.addEventListener("timeupdate", ()=>{ renderTime(); });
-audio.addEventListener("error", ()=>{ if(audio.src) $("csStateTxt").textContent = "加载失败"; });
+audio.addEventListener("loadedmetadata", renderTime);
+audio.addEventListener("durationchange", renderTime);
+audio.addEventListener("timeupdate", renderTime);
+audio.addEventListener("error", ()=>{ if(audio.src) $("csFile").textContent = "FILE NOT FOUND"; });
+/* ---------- 进度条拖动（带防护：总时长未读出前不响应） ---------- */
+(function(){
+  const box = $("csSeek");
+  let dragging = false;
+  function seekTo(x){
+    if(!isFinite(audio.duration) || audio.duration <= 0) return;
+    const r = box.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    audio.currentTime = audio.duration * p;
+    renderTime();
+  }
+  box.addEventListener("pointerdown", e => { dragging = true; try{ box.setPointerCapture(e.pointerId); }catch(_){ } seekTo(e.clientX); e.preventDefault(); });
+  box.addEventListener("pointermove", e => { if(dragging) seekTo(e.clientX); });
+  box.addEventListener("pointerup", () => { dragging = false; });
+  box.addEventListener("pointercancel", () => { dragging = false; });
+})();
 /* ---------- 预加载下一首：当前歌缓冲稳了之后，后台提前下载下一首音频+封面 ---------- */
 const preCache = {};
 const preAudio = new Audio(); preAudio.preload = "auto";
@@ -291,8 +290,7 @@ function prefetchNext(){
 }
 audio.addEventListener("canplaythrough", prefetchNext);
 audio.addEventListener("playing", ()=>{ setTimeout(prefetchNext, 8000); });
-
-/* ---------- 音频图：声道宽度 + 真频谱 ---------- */
+/* ---------- 音频图：声道宽度 + 频谱 ---------- */
 let widenNode = null, widenK = 1, wideIdx = 0;
 const WIDE_STEPS = [{k:1,label:"NORMAL"},{k:1.8,label:"WIDE"},{k:2.6,label:"SUPER"}];
 function ensureGraph(){
@@ -328,46 +326,42 @@ function ensureGraph(){
     merge.connect(analyser);
   }catch(e){ actx = null; analyser = null; }
 }
-
-/* ---------- 频谱 ---------- */
-const specC = $("csSpec"), sg = specC.getContext("2d");
-const N = 14;
+/* ---------- 频谱（本地打开走模拟动画，部署后自动变真频谱） ---------- */
+function startSpec(){ if(raf) return; const loop = ()=>{ drawSpec(); raf = requestAnimationFrame(loop); }; raf = requestAnimationFrame(loop); }
+function stopSpec(){ if(raf){ cancelAnimationFrame(raf); raf = null; } drawFlat(); }
 function drawSpec(){
   sg.clearRect(0,0,52,32);
-  const bw = 52/N;
+  const N = 12, bw = 52/N;
   for(let i=0;i<N;i++){
     let v;
     if(actx && actx.state === "suspended") actx.resume();
     if(analyser && fdata){
       analyser.getByteFrequencyData(fdata);
-      v = fdata[Math.floor(i*fdata.length/N*0.8)] / 255;
+      v = fdata[Math.floor(i*fdata.length/N*0.8)]/255;
     } else{
       const t = performance.now()/1000;
-      const env = Math.exp(-i/N*1.6);
-      v = env * (0.45 + 0.30*Math.sin(t*2.3 + i*1.1) + 0.22*Math.sin(t*3.9 + i*2.3) + 0.10*Math.random());
+      const env = Math.exp(-i/N*1.5);
+      v = env*(0.45 + 0.3*Math.sin(t*2.3 + i*1.1) + 0.22*Math.sin(t*3.9 + i*2.3) + 0.08*Math.random());
     }
-    v = Math.max(0.05, Math.min(1, v));
-    sg.fillStyle = audio.paused ? "rgba(255,255,255,.28)" : "rgba(255,255,255,.85)";
-    sg.fillRect(i*bw+1.5, 32-3-v*26, bw-3, v*26+3);
+    v = Math.max(0.06, Math.min(1, v));
+    const h = v*26;
+    sg.fillStyle = "rgba(255,255,255,.75)";
+    sg.fillRect(i*bw+1.5, 30-h, bw-3, h);
   }
 }
 function drawFlat(){
   sg.clearRect(0,0,52,32);
-  sg.fillStyle = "rgba(255,255,255,.22)";
-  const bw = 52/N;
-  for(let i=0;i<N;i++) sg.fillRect(i*bw+1.5, 29, bw-3, 2);
+  sg.fillStyle = "rgba(255,255,255,.35)";
+  const N = 12, bw = 52/N;
+  for(let i=0;i<N;i++) sg.fillRect(i*bw+1.5, 27, bw-3, 2.5);
 }
-function startSpec(){ if(raf) return; const loop = ()=>{ drawSpec(); raf = requestAnimationFrame(loop); }; raf = requestAnimationFrame(loop); }
-function stopSpec(){ if(raf){ cancelAnimationFrame(raf); raf = null; } drawFlat(); }
-
-/* ---------- DISP 三档 ---------- */
+/* ---------- DISP 三档信息密度 ---------- */
 function applyDisp(){
   const sc = $("camScreen");
   sc.classList.remove("disp-min","disp-none");
   if(disp === 1) sc.classList.add("disp-min");
   if(disp === 2) sc.classList.add("disp-none");
 }
-
 /* ---------- 屏幕照片双指缩放：捏合放大 · 放大后拖动 · 双击或滚轮复原 ---------- */
 (function(){
   const stage = document.querySelector(".cs-photo");
@@ -419,25 +413,24 @@ function applyDisp(){
   },{passive:false});
 })();
 
-/* ---------- 开机动画：闪灯弹出 → 肩屏亮 → 背屏 LOGO → 界面 ---------- */
+/* ---------- 开机动画：背屏 LOGO 光斑 + 肩屏启动 ---------- */
 function bootCam(){
-  const b = $("camBoot"), sh = $("shBoot"), fp = $("flashPop");
-  b.classList.remove("on","off"); sh.classList.remove("on"); fp.classList.remove("up");
-  setTimeout(()=>fp.classList.add("up"), 300);
-  setTimeout(()=>sh.classList.add("on"), 850);
-  setTimeout(()=>b.classList.add("on"), 1250);
-  setTimeout(()=>{ b.classList.add("off"); sh.classList.remove("on"); renderAll(); }, 2150);
+  const b = $("camBoot"), sh = $("shBoot");
+  b.classList.remove("on","off");
+  sh.classList.remove("on");
+  setTimeout(()=>b.classList.add("on"), 80);
+  setTimeout(()=>sh.classList.add("on"), 150);
+  setTimeout(()=>{ b.classList.add("off"); sh.classList.remove("on"); renderAll(); }, 1700);
 }
-
 /* ---------- 初始化 ---------- */
 function init(){
   setCover(); renderAll(); applyDisp();
   $("shutter").onclick = toggle;
-  $("dOk").onclick = toggle;
-  $("dDisp").onclick = ()=>{ disp = (disp+1)%3; applyDisp(); };
-  $("dPrev").onclick = ()=>step(-1);
-  $("dNext").onclick = ()=>step(1);
-  /* ▼ 键：点按 = 切循环模式；长按一秒 = 切声道宽度 */
+  $("camPwr").onclick = bootCam;
+  $("csDisp").onclick = ()=>{ disp = (disp+1)%3; applyDisp(); };
+  $("csPrev").onclick = ()=>step(-1);
+  $("csNext").onclick = ()=>step(1);
+  /* LOOP 键：点按 = 切循环模式；长按一秒 = 切声道宽度 */
   let lpTimer = null, lpLong = false;
   function lpStart(){
     lpLong = false;
@@ -446,22 +439,19 @@ function init(){
       wideIdx = (wideIdx + 1) % WIDE_STEPS.length;
       widenK = WIDE_STEPS[wideIdx].k;
       if(widenNode) widenNode.gain.value = widenK;
-      const el = $("csModeLn"); el.textContent = WIDE_STEPS[wideIdx].label;
+      const el = $("csBpm"); el.textContent = WIDE_STEPS[wideIdx].label;
       setTimeout(()=>{ el.textContent = MODES[mode][0]; }, 1600);
       if(actx && actx.state === "suspended") actx.resume();
     }, 600);
   }
   function lpEnd(){
     clearTimeout(lpTimer);
-    if(!lpLong){ mode = (mode + 1) % 3; renderAll(); }
+    if(!lpLong){ mode = (mode+1)%3; renderAll(); }
   }
-  $("dLoop").addEventListener("touchstart", e=>{ e.preventDefault(); lpStart(); });
-  $("dLoop").addEventListener("touchend", e=>{ e.preventDefault(); lpEnd(); });
-  $("dLoop").addEventListener("mousedown", lpStart);
-  $("dLoop").addEventListener("mouseup", lpEnd);
-  $("camPwr").onclick = bootCam;
-  let deg = 0;
-  $("modeDial").onclick = ()=>{ deg += 45; $("modeDial").style.transform = `rotate(${deg}deg)`; };
+  $("csMode").addEventListener("touchstart", e=>{ e.preventDefault(); lpStart(); });
+  $("csMode").addEventListener("touchend", e=>{ e.preventDefault(); lpEnd(); });
+  $("csMode").addEventListener("mousedown", lpStart);
+  $("csMode").addEventListener("mouseup", lpEnd);
   specC.width = 104; specC.height = 64; sg.scale(2,2);
   drawFlat();
   if(SONGS[0].src){ audio.src = SONGS[0].src; audio.load(); }
